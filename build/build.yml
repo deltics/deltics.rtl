@@ -27,20 +27,20 @@ steps:
 
 - template: build-all.yml@orgTemplates
   parameters:
-    delphiVersions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, 10, 10.3 ]
+    delphiVersions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
 
 - template: build-all.yml@orgTemplates
   parameters:
-    delphiVersions: [ xe2, xe3, xe4, 10, 10.3 ]
+    delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
     platform: x64
 
 - template: test-all.yml@orgTemplates
   parameters:
-    delphiVersions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, 10, 10.3 ]
+    delphiVersions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
 
 - template: test-all.yml@orgTemplates
   parameters:
-    delphiVersions: [ xe2, xe3, xe4, 10, 10.3 ]
+    delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
     platform: x64
 
 - task: PublishTestResults@2
@@ -63,4 +63,3 @@ steps:
     duget push $feed
 
   displayName: Publish Duget package
-    
