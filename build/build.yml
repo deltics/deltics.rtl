@@ -9,10 +9,6 @@ resources:
       type: github
       name: deltics/azure-pipeline-templates
       endpoint: GitHubTemplates
-    - repository: orgTemplates
-      type: git
-      name: PipelineTemplates/default
-      endpoint: GitHubTemplates
 
 pool:
   name: 'The Den'
@@ -25,22 +21,22 @@ steps:
     duget restore --path tests
   displayName: 'Restore Duget dependencies'
 
-- template: build-all.yml@orgTemplates
+- template: build-all.yml
   parameters:
-    delphiVersions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
+    delphiVersions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, 10, 10.3 ]
 
-- template: build-all.yml@orgTemplates
+- template: build-all.yml
   parameters:
-    delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
+    delphiVersions: [ xe2, xe3, xe4, 10, 10.3 ]
     platform: x64
 
-- template: test-all.yml@orgTemplates
+- template: test-all.yml
   parameters:
-    delphiVersions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
+    delphiVersions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, 10, 10.3 ]
 
-- template: test-all.yml@orgTemplates
+- template: test-all.yml
   parameters:
-    delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
+    delphiVersions: [ xe2, xe3, xe4, 10, 10.3 ]
     platform: x64
 
 - task: PublishTestResults@2
@@ -63,3 +59,4 @@ steps:
     duget push $feed
 
   displayName: Publish Duget package
+    
