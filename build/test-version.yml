@@ -1,0 +1,12 @@
+parameters:
+  delphiVersion: ''
+  platform: 'x86'
+
+steps:
+- powershell: |
+    $exe = Join-Path '.bin'     'rtltests.${{ parameters.delphiVersion }}.${{ parameters.platform }}.exe'
+    $xml = Join-Path '.results' 'delphi.${{ parameters.delphiVersion }}.${{ parameters.platform }}.xml'
+    $cmd = $exe + " -filename:$xml -delphiVersion:${{ parameters.delphiVersion }}"
+
+    Invoke-Expression $cmd
+  displayName: Execute tests for Delphi ${{ parameters.delphiVersion }} (${{ parameters.platform }})

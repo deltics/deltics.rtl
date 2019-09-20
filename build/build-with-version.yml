@@ -1,0 +1,12 @@
+parameters:
+  delphiVersion: ''
+  platform: 'x86'
+
+steps:
+- template: delphi-build.yml@templates
+  parameters:
+    delphiVersion: ${{ parameters.delphiVersion }}
+    platform: ${{ parameters.platform }}
+    project: tests\rtltests
+    preBuildInline: duget restore --noUnpack --log:$(dugetLogLevel)
+    postBuildInline: Rename-Item .bin\rtltests.exe rtltests.${{ parameters.DelphiVersion }}.${{ parameters.platform }}.exe
