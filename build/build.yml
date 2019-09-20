@@ -13,10 +13,6 @@ resources:
 pool:
   name: 'The Den'
 
-variables:
-  x86Versions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
-  x64Versions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
-
 steps:
 - template: gitversion.yml@templates
 
@@ -27,20 +23,20 @@ steps:
 
 - template: build-all.yml
   parameters:
-    delphiVersions: $(x86Versions)
+    delphiVersions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
 
 - template: build-all.yml
   parameters:
-    delphiVersions: $(x64Versions)
+    delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
     platform: x64
 
 - template: test-all.yml
   parameters:
-    delphiVersions: $(x86Versions)
+    delphiVersions: [ 7, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
 
 - template: test-all.yml
   parameters:
-    delphiVersions: $(x64Versions)
+    delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
     platform: x64
 
 - task: PublishTestResults@2
