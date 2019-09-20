@@ -13,6 +13,9 @@ resources:
 pool:
   name: 'The Den'
 
+variables:
+  dugetLogLevel: info
+
 steps:
 - template: gitversion.yml@templates
 
