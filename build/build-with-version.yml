@@ -7,6 +7,6 @@ steps:
   parameters:
     delphiVersion: ${{ parameters.delphiVersion }}
     platform: ${{ parameters.platform }}
-    project: tests\rtltests
+    project: tests\tests
     preBuildInline: duget restore --noUnpack --log:$(dugetLogLevel)
-    postBuildInline: Rename-Item .bin\rtltests.exe rtltests.${{ parameters.DelphiVersion }}.${{ parameters.platform }}.exe
+    postBuildInline: Rename-Item .bin\tests.exe tests.${{ parameters.DelphiVersion }}.${{ parameters.platform }}.exe

@@ -4,16 +4,14 @@ parameters:
 
 steps:
 - powershell: |
-    $exe = Join-Path '.bin' 'rtltests.${{ parameters.delphiVersion }}.${{ parameters.platform }}.exe'
+    $exe = Join-Path '.bin' 'tests.${{ parameters.delphiVersion }}.${{ parameters.platform }}.exe'
     if (-Not(Test-Path $exe))
     {
-        Write-Host '##vso[task.complete result=skipped]Test executable for Delphi ${{ parameters.delphiVersion }} not found.'
+        Write-Host '##vso[task.complete result=skipped]Test executable for Delphi ${{ parameters.delphiVersion }} (${{ parameters.platform }}) not found.'
     }
     else
     {
-        $xml = Join-Path '.results' 'delphi.${{ parameters.delphiVersion }}.${{ parameters.platform }}.xml'
-        $cmd = "$exe -filename:$xml -delphiVersion:${{ parameters.delphiVersion }}"
-
+        $cmd = "$exe -xunit2:results.xml"
         Invoke-Expression $cmd
     }
   displayName: Execute tests for Delphi ${{ parameters.delphiVersion }} (${{ parameters.platform }})
