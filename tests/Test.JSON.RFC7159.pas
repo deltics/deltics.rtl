@@ -154,5 +154,5 @@ implementation
 
 
 initialization
-  Smoketest.Add(TUnitTest_JSON, [TRFC7159]);
+  Smoketest.Add(TJsonTests, [TRFC7159]);
 end.

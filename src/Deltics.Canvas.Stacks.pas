@@ -2,6 +2,7 @@
 
   unit Deltics.Canvas.Stacks;
 
+{$i deltics.rtl.inc}
 
 interface
 
@@ -116,12 +117,12 @@ interface
     TClipRgnStack = class(TGDIObjectStack)
     private
       function get_Handle: HRGN;
-      function Peek: HRGN;
     protected
       function DoSelect(const aItem: THandle): THandle; override;
     public
       procedure Exclude(const aRect: TRect); overload;
       procedure Exclude(const aRGN: HRGN); overload;
+      function Peek: HRGN;
       procedure Push(const aRGN: HRGN); overload;
       procedure Push(const aRect: TRect); overload;
       procedure Push(const aLeft, aTop, aRight, aBottom: Integer); overload;
@@ -154,6 +155,10 @@ interface
 implementation
 
   uses
+  {$ifdef DELPHI2006__} // For inline expansions
+    Classes,
+    Types,
+  {$endif}
     Deltics.GDI.Regions;
 
 

@@ -17,7 +17,6 @@ interface
       fName: String;
       fValues: IStringList;
     private
-      constructor Detected(const aName: String; const aValues: IStringList); overload;
       constructor Create(const aName: String; const aValues: IStringList; const aEnabled: Boolean); overload;
     public
       constructor Create(const aName: String; const aValue: String); overload;
@@ -48,7 +47,12 @@ interface
       function Contains(const aSwitch: String; var aValue: String): Boolean; overload;
       function Contains(const aSwitch: String; var aValues: IStringList): Boolean; overload;
     private
+      fCommandLine: TWeakInterface;
       procedure AddSwitch(const aSwitch: String; const aValues: IStringList);
+    function get_CommandLine: ICommandLine;
+    public
+      constructor Create(const aCommandLine: ICommandLine);
+      property CommandLine: ICommandLine read get_CommandLine;
     end;
 
 
@@ -79,13 +83,6 @@ implementation
     fName       := aName;
     fValues     := aValues;
     fIsEnabled  := aEnabled;
-  end;
-
-
-  constructor TCommandLineSwitch.Detected(const aName: String;
-                                          const aValues: IStringList);
-  begin
-    Create(aName, aValues.Clone, TRUE);
   end;
 
 
@@ -196,6 +193,14 @@ implementation
 
 { TCommandLineSwitchList }
 
+  constructor TCommandLineSwitches.Create(const aCommandLine: ICommandLine);
+  begin
+    inherited Create;
+
+    fCommandLine := TWeakInterface.Create(aCommandLine);
+  end;
+
+
   procedure TCommandLineSwitches.AddSwitch(const aSwitch: String; const aValues: IStringList);
   var
     switch: ICommandLineSwitch;
@@ -215,7 +220,12 @@ implementation
   var
     i, j: Integer;
     alts: IStringList;
+    cmd: ICommandLine;
+    param: String;
   begin
+    // First check registered switches as these may have ALT options which
+    //  may match even if the actual option on the command line is different
+
     for i := 0 to Pred(get_Count) do
     begin
       aSwitch := get_Item(i);
@@ -235,6 +245,33 @@ implementation
       end;
     end;
 
+    // OK, so now we need to scan the command line itself
+
+    cmd := CommandLine;
+    for i := 1 to Pred(cmd.Params.Count) do
+    begin
+      param := cmd.Params[i];
+
+      if NOT param.BeginsWith('-') then
+        CONTINUE;
+
+      STR.DeleteLeft(param, 1);
+
+      if NOT param.BeginsWithText(aString) then
+        CONTINUE;
+
+      STR.DeleteLeft(param, aString);
+      result := param.IsEmpty or (ANSIChar(param[1]) in [':', '=']);
+
+      if result AND param.IsEmpty then
+        EXIT;
+
+      STR.DeleteLeft(param, 1);
+
+      aSwitch := TCommandLineSwitch.Create(aString, param);
+      EXIT;
+    end;
+
     aSwitch := NIL;
     result  := FALSE;
   end;
@@ -252,13 +289,19 @@ implementation
 
 
   function TCommandLineSwitches.Contains(const aSwitch: String;
-                                         var aValues: IStringList): Boolean;
+                                         var   aValues: IStringList): Boolean;
   var
     switch: ICommandLineSwitch;
   begin
     result := Contains(aSwitch, switch);
     if result then
       aValues := switch.Values.Clone;
+  end;
+
+
+  function TCommandLineSwitches.get_CommandLine: ICommandLine;
+  begin
+    result := fCommandLine as ICommandLine;
   end;
 
 

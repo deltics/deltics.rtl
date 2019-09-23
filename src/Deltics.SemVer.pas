@@ -23,9 +23,11 @@ interface
       function get_MinorVersion: Integer;
       function get_Patch: Integer;
       function get_Identifiers: TIdentifierList;
+      function get_IsPreRelease: Boolean;
       function get_MetaData: TIdentifierList;
       procedure set_AsString(const aValue: String);
       function IsCompatibleWith(const aReference: String): Boolean; overload;
+      function IsCompatibleWith(const aReference: ISemVer): Boolean; overload;
       function IsCompatibleWith(const aReference: TSemVerReference): Boolean; overload;
       function IsNewerThan(const aVersion: String): Boolean; overload;
       function IsNewerThan(const aVersion: ISemVer): Boolean; overload;
@@ -34,6 +36,7 @@ interface
       property MinorVersion: Integer read get_MinorVersion;
       property Patch: Integer read get_Patch;
       property Identifiers: TIdentifierList read get_Identifiers;
+      property IsPreRelease: Boolean read get_IsPreRelease;
       property MetaData: TIdentifierList read get_Metadata;
       property Version: String read get_AsString write set_AsString;
     end;
@@ -54,8 +57,8 @@ interface
       function get_MinorVersion: Integer;
       function get_Patch: Integer;
       function get_Identifiers: TIdentifierList;
+      function get_IsPreRelease: Boolean;
       function get_MetaData: TIdentifierList;
-      function get_Version: String;
       procedure set_AsString(const aValue: String);
     protected
       procedure Parse(const aVersion: String);
@@ -63,6 +66,7 @@ interface
       constructor Create(const aVersion: String = '');
       destructor Destroy; override;
       function IsCompatibleWith(const aReference: String): Boolean; overload;
+      function IsCompatibleWith(const aVersion: ISemVer): Boolean; overload;
       function IsCompatibleWith(const aReference: TSemVerReference): Boolean; overload;
       function IsNewerThan(const aVersion: String): Boolean; overload;
       function IsNewerThan(const aVersion: ISemVer): Boolean; overload;
@@ -72,6 +76,7 @@ interface
       property Patch: Integer read fPatch;
       property Identifiers: TIdentifierList read fIdentifiers;
       property MetaData: TIdentifierList read fMetadata;
+      property Version: String read get_AsString write set_AsString;
     end;
 
 
@@ -270,6 +275,12 @@ implementation
   end;
 
 
+  function TSemVer.get_IsPreRelease: Boolean;
+  begin
+    result := (fIdentifiers.Count > 0);
+  end;
+
+
   function TSemVer.get_MajorVersion: Integer;
   begin
     result := fMajorVersion;
@@ -291,12 +302,6 @@ implementation
   function TSemVer.get_Patch: Integer;
   begin
     result := fPatch;
-  end;
-
-
-  function TSemVer.get_Version: String;
-  begin
-    result := get_AsString;
   end;
 
 
@@ -334,6 +339,13 @@ implementation
     result := (Patch >= aReference.Patch) or (aReference.Patch = ANY_VERSION);
     if NOT result then
       EXIT;
+  end;
+
+
+
+  function TSemVer.IsCompatibleWith(const aVersion: ISemVer): Boolean;
+  begin
+    result := (MajorVersion = aVersion.MajorVersion);
   end;
 
 

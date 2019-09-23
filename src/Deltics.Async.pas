@@ -56,7 +56,7 @@ implementation
     protected
       procedure Execute; override;
     public
-      constructor Create(aTask: TAsyncTask);
+      constructor Create(aTask: TAsyncTask); reintroduce;
     end;
 
 

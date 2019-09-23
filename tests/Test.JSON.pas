@@ -1,4 +1,4 @@
-
+ï»¿
 {$i deltics.inc}
 
   unit Test.JSON;
@@ -12,10 +12,7 @@ interface
 
 
   type
-    TUnitTest_JSON = class(TTestCase, INameCase,
-                                      ISetupTestCase,
-                                      ICleanupTestCase,
-                                      ICleanupTest)
+    TUnitTest_JSON = class(TTest)
     private
       fJSON: TJSONObject;
     private
@@ -62,7 +59,7 @@ implementation
                   + '  "sixth"  : ['#13
                   + '             ],'#13
                   + '  "seventh": null,'#13
-                  + '  "Windows™ 8": "Microsoft™",'#13
+                  + '  "Windowsâ„¢ 8": "Microsoftâ„¢",'#13
                   + '  "ninth"  : { }'#13
                   + '}';
 
@@ -171,7 +168,7 @@ implementation
   procedure TUnitTest_JSON.StringDecoding;
   begin
     Test('String (ASCII)').     Expect(TJSONString.Decode('"windows"')).Equals('windows');
-    Test('String (Unicode)').   Expect(TJSONString.Decode('Windows\u2122')).Equals('Windows™');
+    Test('String (Unicode)').   Expect(TJSONString.Decode('Windows\u2122')).Equals('Windowsâ„¢');
     Test('String (path)').      Expect(TJSONString.Decode('\\\\psf\\home')).Equals('\\psf\home');
     Test('String (url)').       Expect(TJSONString.Decode('"www.deltics.co.nz\/blog"')).Equals('www.deltics.co.nz/blog');;
     Test('String (quotes)').    Expect(TJSONString.Decode('\"Come here\", he said')).Equals('"Come here", he said');
@@ -183,7 +180,7 @@ implementation
   procedure TUnitTest_JSON.StringEncoding;
   begin
     Test('String (ASCII)').     Expect(TJSONString.Encode('windows')).Equals('"windows"');
-    Test('String (Unicode)').   Expect(TJSONString.Encode('Windows™')).Equals('"Windows\u2122"');
+    Test('String (Unicode)').   Expect(TJSONString.Encode('Windowsâ„¢')).Equals('"Windows\u2122"');
     Test('String (path)').      Expect(TJSONString.Encode('\\psf\home')).Equals('"\\\\psf\\home"');
     Test('String (url)').       Expect(TJSONString.Encode('www.deltics.co.nz/blog')).Equals('"www.deltics.co.nz\/blog"');
     Test('String (quotes)').    Expect(TJSONString.Encode('"Come here", he said')).Equals('"\"Come here\", he said"');
@@ -223,7 +220,7 @@ implementation
   {$endif}
 
     JSON.Add('ascii string',      'windows');
-    JSON.Add('unicode string',    'Windows™');
+    JSON.Add('unicode string',    'Windowsâ„¢');
     JSON.Add('path',              '\\psf\home');
     JSON.Add('url',               'www.deltics.co.nz/blog');
     JSON.Add('ctrl chars',        #9'tabbed'#13#10'new lines'#8#12'new page');
@@ -262,7 +259,7 @@ implementation
     try
       obj.Add('1', 'first');
       obj.Add('2', 'second');
-      obj.Add('3', '©2013');
+      obj.Add('3', 'Â©2013');
       Test('object').Expect(obj.AsJSON).Equals('{"1":"first","2":"second","3":"\u00A92013"}');
 
     finally
@@ -273,7 +270,7 @@ implementation
     try
       arr.Add('first');
       arr.Add('second');
-      arr.Add('©2013');
+      arr.Add('Â©2013');
       Test('array').Expect(arr.AsJSON).Equals('["first","second","\u00A92013"]');
 
     finally
@@ -377,9 +374,9 @@ implementation
       Test('First value').Expect(local['first'].AsInteger).Equals(10);
       Test('Second value').Expect(local['second'].AsBoolean).Equals(TRUE);
 
-      Test('™ symbol decoded in "fourth" item value!').Expect(local['fourth'].AsString).Contains('™');
-      Test('™ symbol decoded in 8th item name!').Expect(local.ValueByIndex[7].Name).Contains('™');
-      Test('™ symbol decoded in 8th item value!').Expect(local.ValueByIndex[7].AsString).Contains('™');
+      Test('â„¢ symbol decoded in "fourth" item value!').Expect(local['fourth'].AsString).Contains('â„¢');
+      Test('â„¢ symbol decoded in 8th item name!').Expect(local.ValueByIndex[7].Name).Contains('â„¢');
+      Test('â„¢ symbol decoded in 8th item value!').Expect(local.ValueByIndex[7].AsString).Contains('â„¢');
 
       Test('5th is an empty array!').Expect(local['fifth'].AsArray.Count).Equals(0);
       Test('6th is an empty array!').Expect(local['sixth'].AsArray.Count).Equals(0);
@@ -397,9 +394,9 @@ implementation
       Test('First value').Expect(local['first'].AsInteger).Equals(10);
       Test('Second value').Expect(local['second'].AsBoolean).Equals(TRUE);
 
-      Test('™ symbol decoded in "fourth" item value!').Expect(local['fourth'].AsString).Contains('™');
-      Test('™ symbol decoded in 8th item name!').Expect(local.ValueByIndex[7].Name).Contains('™');
-      Test('™ symbol decoded in 8th item value!').Expect(local.ValueByIndex[7].AsString).Contains('™');
+      Test('â„¢ symbol decoded in "fourth" item value!').Expect(local['fourth'].AsString).Contains('â„¢');
+      Test('â„¢ symbol decoded in 8th item name!').Expect(local.ValueByIndex[7].Name).Contains('â„¢');
+      Test('â„¢ symbol decoded in 8th item value!').Expect(local.ValueByIndex[7].AsString).Contains('â„¢');
 
     finally
       local.Free;
@@ -413,7 +410,7 @@ implementation
     DATA = '{"name" : "This item contains a Unicode ''trademark'' symbol: \u2122"}';
   begin
     JSON.AsString := DATA;
-    Test('Unicode unescaped').Expect(JSON['name'].AsString).Contains('™');
+    Test('Unicode unescaped').Expect(JSON['name'].AsString).Contains('â„¢');
 
     Test('Unicode escaped ({actual})').Expect(JSON['name'].AsJSON).Contains('\u2122');
   end;

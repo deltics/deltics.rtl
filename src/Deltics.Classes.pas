@@ -1255,7 +1255,7 @@ implementation
   {$ifdef DELPHIXE2__}
     const
       cnAdded     = TCollectionNotification.cnAdded;
-      cnDeleting  = TCollectionNotification.cnAdded;
+      cnDeleting  = TCollectionNotification.cnDeleting;
   {$endif}
   begin
     inherited;

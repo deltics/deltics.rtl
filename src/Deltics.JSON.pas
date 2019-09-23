@@ -75,6 +75,7 @@ interface
         TJSONArray  = class;
         TJSONObject  = class;
 
+    TJsonFormat = (jfStandard, jfCompact, jfConfig);
 //      TJSONComment = class;
 
 
@@ -269,8 +270,8 @@ interface
         procedure Load(const aSource: IUnicodeReader);
         procedure LoadFromFile(const aFileName: UnicodeString; const aEncoding: TEncoding; const aBufferKB: Word);
         procedure LoadFromStream(const aStream: TStream; const aEncoding: TEncoding; const aBufferKB: Word);
-        procedure SaveToFile(const aFileName: UnicodeString; const aCompact: Boolean = FALSE);
-        procedure SaveToStream(const aStream: TStream; const aCompact: Boolean = FALSE);
+        procedure SaveToFile(const aFileName: UnicodeString; const aFormat: TJsonFormat = jfStandard);
+        procedure SaveToStream(const aStream: TStream; const aFormat: TJsonFormat = jfStandard);
         procedure Wipe; override; abstract;
         property AsDisplayText: UnicodeString read get_AsDisplayText;
         property IsEmpty: Boolean read get_IsEmpty;
@@ -296,6 +297,7 @@ interface
           function Add(const aValue: TGUID): TJSONString; reintroduce; overload;
           function Add(const aValue: TJSONStructure): TJSONStructure; reintroduce; overload;
           function Add(const aValue: Integer; const aTypeInfo: PTypeInfo): TJSONString; reintroduce; overload;
+          procedure Add(const aValues: IStringList); reintroduce; overload;
           procedure Add(const aValue: TJSONValue); override;
           function AddArray: TJSONArray; reintroduce;
           procedure AddNull; reintroduce;
@@ -382,6 +384,11 @@ interface
       function ReadValue: TJSONValue;
       property Line: Integer read fLine;
       property Pos: Integer read fPos;
+    end;
+
+
+    JsonFormatter = class
+      class function Format(const aJson: TJsonStructure; const aFormat: TJsonFormat): String;
     end;
 
 
@@ -1534,13 +1541,13 @@ implementation
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   procedure TJSONStructure.SaveToFile(const aFileName: UnicodeString;
-                                 const aCompact: Boolean);
+                                      const aFormat: TJsonFormat);
   var
     stream: TMemoryStream;
   begin
     stream := TMemoryStream.Create;
     try
-      SaveToStream(stream, aCompact);
+      SaveToStream(stream, aFormat);
       stream.SaveToFile(aFileName);
 
     finally
@@ -1551,14 +1558,11 @@ implementation
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   procedure TJSONStructure.SaveToStream(const aStream: TStream;
-                                   const aCompact: Boolean);
+                                        const aFormat: TJsonFormat);
   var
     s: UTF8String;
   begin
-    if aCompact then
-      s := UTF8.FromWide(AsString)
-    else
-      s := UTF8.FromWide(AsDisplayText);
+    s := UTF8.FromWIDE(JsonFormatter.Format(self, aFormat));
 
     aStream.Write(s[1], Length(s));
   end;
@@ -1645,6 +1649,16 @@ implementation
   begin
     fIsNull := FALSE;
     fItems.Add(aValue);
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  procedure TJSONArray.Add(const aValues: IStringList);
+  var
+    i: Integer;
+  begin
+    for i := 0 to Pred(aValues.Count) do
+      Add(aValues[i]);
   end;
 
 
@@ -3017,6 +3031,152 @@ implementation
 
 
 
+
+
+
+{ JsonFormatter }
+
+  class function JsonFormatter.Format(const aJson: TJsonStructure; const aFormat: TJsonFormat): String;
+
+    function ObjectToString(const aObject: TJSONObject;
+                            const aIndent: Integer): UnicodeString; forward;
+
+    function ArrayToString(const aArray: TJSONArray;
+                           const aIndent: Integer): UnicodeString;
+    var
+      i: Integer;
+      item: TJSONValue;
+    begin
+      if (aArray.Count = 0) then
+      begin
+        result := '[]';
+        EXIT;
+      end;
+
+      result := '[';
+      if aFormat in [jfStandard, jfConfig] then
+        result := result + #13#10;
+
+      if aArray.Count > 0 then
+      begin
+        for i := 0 to Pred(aArray.Count) do
+        begin
+          item := aArray.Items[i];
+
+          if aFormat in [jfStandard, jfConfig] then
+            result := result + StringOfChar(' ', aIndent);
+
+          if NOT item.IsNull then
+            case item.ValueType of
+              jsString  : result := result + TJSONString.Encode(item.AsString);
+
+              jsArray   : begin
+                            if aFormat in [jfStandard, jfConfig] then
+                              result := result + '  ';
+                            result := result + ArrayToString(item as TJSONArray, aIndent + 2);
+                          end;
+
+              jsObject  : begin
+                            if aFormat in [jfStandard, jfConfig] then
+                              result := result + '  ';
+                            result := result + ObjectToString(item as TJSONObject, aIndent + 2);
+                          end;
+            else
+              result := result + item.AsString;
+            end
+          else
+          begin
+            if aFormat in [jfStandard, jfConfig] then
+              result := result + '  ';
+            result := result + 'null';
+          end;
+
+          result := result + ',';
+
+          if aFormat in [jfStandard, jfConfig] then
+            result := result + #13#10;
+        end;
+
+        if aFormat in [jfStandard, jfConfig] then
+          SetLength(result, Length(result) - 3)
+        else
+          SetLength(result, Length(result) - 1)
+      end;
+
+      if aFormat in [jfStandard, jfConfig] then
+        result := result + #13#10 + StringOfChar(' ', aIndent - 2);
+
+      result := result + ']';
+    end;
+
+    function ObjectToString(const aObject: TJSONObject;
+                            const aIndent: Integer): UnicodeString;
+    var
+      i: Integer;
+      value: TJSONValue;
+    begin
+      if (aObject.ValueCount = 0) then
+      begin
+        result := '{}';
+        EXIT;
+      end;
+
+      result := '{';
+      if aFormat in [jfStandard, jfConfig] then
+        result := result + #13#10;
+
+      if aObject.ValueCount > 0 then
+      begin
+        for i := 0 to Pred(aObject.ValueCount) do
+        begin
+          value := aObject.ValueByIndex[i];
+
+          if aFormat in [jfStandard, jfConfig] then
+            result := result + StringOfChar(' ', aIndent + 2);
+
+          if (aFormat = jfConfig) then
+            result := result + value.Name
+          else
+            result := result + TJSONString.Encode(value.Name);
+
+          result := result + ':';
+
+          if value.IsNull then
+            result := result + 'null'
+          else
+            case value.ValueType of
+              jsString  : result := result + TJSONString.Encode(value.AsString);
+              jsArray   : result := result + ArrayToString(value as TJSONArray, aIndent + 4);
+              jsObject  : result := result + ObjectToString(value as TJSONObject, aIndent + 4);
+            else
+              result := result + value.AsString;
+            end;
+
+          result := result + ',';
+          if aFormat in [jfStandard, jfConfig] then
+            result := result + #13#10;
+        end;
+
+        if aFormat in [jfStandard, jfConfig] then
+          SetLength(result, Length(result) - 3)
+        else
+          SetLength(result, Length(result) - 1);
+      end;
+
+      if aFormat in [jfStandard, jfConfig] then
+        result := result + #13#10 + StringOfChar(' ', aIndent);
+
+      result := result + '}';
+    end;
+
+  begin
+    case aJson.ValueType of
+      jsArray   : result := ArrayToString(TJSONArray(aJson), 0);
+      jsObject  : result := ObjectToString(TJSONObject(aJson), 0);
+    else
+      result := 'Not a JSON array or object';
+    end;
+  end;
 
 
 

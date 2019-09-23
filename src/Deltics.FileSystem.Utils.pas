@@ -6,6 +6,8 @@
 interface
 
   uses
+    SysUtils,
+    Deltics.Strings,
     Deltics.Uri;
 
 
@@ -21,6 +23,7 @@ interface
       class function AbsoluteToRelative(const aPath: String; const aBasePath: String = ''): String;
       class function RelativeToAbsolute(const aRelativePath: String; const aRootPath: String = ''): String;
       class function Volume(const aAbsolutePath: String): String;
+      class function MakePath(const aElements: array of const): String;
       class function PathFromUri(const aUri: TUri): String; overload;
       class function PathFromUri(const aUri: String): String; overload;
     end;
@@ -33,9 +36,79 @@ implementation
 
   uses
     ShellApi,
-    SysUtils,
-    Deltics.Strings,
     Deltics.StringTemplates;
+
+
+  function ConstArgAsString(aValue: TVarRec): String;
+  var
+    s: String;
+  begin
+    case aValue.VType of
+      vtBoolean,
+      vtObject,
+      vtClass,
+      vtInterface:
+        raise ENotSupportedException.Create('Unable to render const array value as string');
+
+      vtInteger:
+        result := IntToStr(aValue.VInteger);
+
+      vtWideChar,
+      vtChar:
+        if aValue.VType = vtChar then
+          result := STR.FromANSI(ANSIChar(aValue.VChar))
+        else
+          result := STR.FromWIDE(WIDEChar(aValue.VWideChar));
+
+      vtExtended, vtCurrency:
+        raise ENotSupportedException.Create('Unable to render const array value as string');
+
+      vtPointer:
+        result := IntToHex(IntPtr(aValue.VPointer), SizeOf(Pointer) * 2);
+
+      vtPChar:
+        result := STR.FromANSI(AnsiString(aValue.VPChar));
+
+      vtPWideChar:
+        result := STR.FromBuffer(aValue.VPWideChar);
+
+    {$IFNDEF NEXTGEN}
+      vtString:
+        result := UnicodeString(PShortString(aValue.VAnsiString)^);
+
+      vtAnsiString:
+        result := STR.FromANSI(ANSIString(aValue.VAnsiString^));
+
+      vtWideString:
+        result := STR.FromBuffer(PWIDEChar(aValue.VWideString));
+    {$ENDIF !NEXTGEN}
+
+      vtVariant:
+        if Assigned(System.VarToUStrProc) then
+        begin
+          System.VarToUStrProc(s, TVarData(aValue.VVariant^));
+          result := s;
+        end;
+
+      vtInt64:
+        result := IntToStr(aValue.VInt64^);
+
+      vtUnicodeString:
+        result := UnicodeString(aValue.VUnicodeString);
+    end;
+  end;
+
+
+  function ConstArgsAsStringArray(aArgs: array of const): TStringArray;
+  var
+    i: Integer;
+  begin
+    SetLength(result, Length(aArgs));
+
+    for i := 0 to High(aArgs) do
+      result[i] := ConstArgAsString(aArgs[i]);
+  end;
+
 
 
 { TFileSystem }
@@ -123,6 +196,22 @@ implementation
   }
   begin
     result := ExtractFilename(aPath);
+  end;
+
+
+  class function Path.MakePath(const aElements: array of const): String;
+  var
+    i: Integer;
+    strs: TStringArray;
+  begin
+    result := '';
+    if Length(aElements) = 0 then
+      EXIT;
+
+    strs := ConstArgsAsStringArray(aElements);
+    result := strs[0];
+    for i := 1 to High(strs) do
+      result := Path.Append(result, strs[i]);
   end;
 
 

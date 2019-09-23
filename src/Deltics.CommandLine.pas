@@ -129,14 +129,13 @@ implementation
                                   const aParams: String);
   var
     cmd: ICommandLine;
-    exe: String;
   begin
     inherited Create;
 
     cmd := self as ICommandLine;
 
     fArguments  := TComInterfacedStringList.Create;
-    fSwitches   := TCommandLineSwitches.Create;
+    fSwitches   := TCommandLineSwitches.Create(cmd);
 
     if fCommandLine <> '' then
     begin
@@ -200,7 +199,6 @@ implementation
     paramCount: Integer;
     s: String;
     v: String;
-    switch: ICommandLineSwitch;
     switchString: String;
     switchValues: IStringList;
   begin

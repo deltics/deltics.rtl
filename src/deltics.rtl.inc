@@ -5,6 +5,5 @@
 
 {$ifdef debugDelticsRtl}
   {$debuginfo ON}
-  {$define debugDelticsRtlClasses}
 {$endif}
 

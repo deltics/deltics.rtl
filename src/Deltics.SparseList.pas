@@ -71,7 +71,6 @@ interface
       function get_Key(const aIndex: Integer): Int64;
     protected
       procedure DoGetItemClass(var aClass: TSparseListItemClass); virtual;
-      procedure AfterConstruction; override;
       function Add(const aKey: Int64): TSparseListItem;
       function Find(const aKey: Int64; var aIndex: Integer): Boolean;
       function Floor(const aKey: Int64): TSparseListItem; overload;
@@ -82,6 +81,7 @@ interface
     public
       constructor Create(const aAutoInsert: Boolean = FALSE);
       destructor Destroy; override;
+      procedure AfterConstruction; override;
       procedure Clear;
       procedure Delete(const aKey: Int64);
       property AutoInsert: Boolean read fAutoInsert write fAutoInsert;
