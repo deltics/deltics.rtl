@@ -56,7 +56,7 @@ interface
       constructor Create(const aForm: TForm); overload;
       constructor CreateNonClient(const aForm: TForm);
       destructor Destroy; override;
-      procedure Draw(aX, aY: Integer; aGraphic: TGraphic); overload; {$ifdef DELPHI2009__}override;{$endif}
+      procedure Draw(aX, aY: Integer; aGraphic: TGraphic); overload; {$ifdef DELPHI2010__}override;{$endif}
       procedure Draw(const aGraphic: TGraphic; const aRect: TRect); overload;
       procedure DrawHorizontalLine(const aY, aLeft, aRight: Integer);
       procedure DrawIcon(const aIcon: HICON; const aRect: TRect);

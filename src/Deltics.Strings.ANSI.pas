@@ -409,13 +409,13 @@ interface
       class function Trim(const aString: ANSIString): ANSIString; overload;
       class function Trim(const aString: ANSIString; aChar: ANSIChar): ANSIString; overload;
       class function Trim(const aString: ANSIString; aCount: Integer): ANSIString; overload;
-      class function TrimLeft(const aString: ANSIString; aCount: Integer): ANSIString; overload;
-      class function TrimLeft(const aString: ANSIString): ANSIString; overload;
-      class function TrimLeft(const aString: ANSIString; aChar: ANSIChar): ANSIString; overload;
-      class function TrimRight(const aString: ANSIString; aCount: Integer): ANSIString; overload;
-      class function TrimRight(const aString: ANSIString): ANSIString; overload;
-      class function TrimRight(const aString: ANSIString; aChar: ANSIChar): ANSIString; overload;
-      class function TrimRight(const aString: ANSIString; aChar: WIDEChar): ANSIString; overload;
+      class function LTrim(const aString: ANSIString; aCount: Integer): ANSIString; overload;
+      class function LTrim(const aString: ANSIString): ANSIString; overload;
+      class function LTrim(const aString: ANSIString; aChar: ANSIChar): ANSIString; overload;
+      class function RTrim(const aString: ANSIString; aCount: Integer): ANSIString; overload;
+      class function RTrim(const aString: ANSIString): ANSIString; overload;
+      class function RTrim(const aString: ANSIString; aChar: ANSIChar): ANSIString; overload;
+      class function RTrim(const aString: ANSIString; aChar: WIDEChar): ANSIString; overload;
 
       class function Unbrace(const aString: ANSIString): ANSIString; overload;
       class function Unbrace(const aString: ANSIString; var aResult: ANSIString): Boolean; overload;
@@ -1340,7 +1340,7 @@ implementation
   class function ANSIFn.Format(const aString: ANSIString;
                                const aArgs: array of const): ANSIString;
   begin
-  {$ifdef UNICODE}
+  {$ifdef DELPHIXE4__}
     result := ANSIStrings.Format(aString, aArgs);
   {$else}
     result := SysUtils.Format(aString, aArgs);
@@ -5491,7 +5491,7 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function ANSIFn.TrimLeft(const aString: ANSIString): ANSIString;
+  class function ANSIFn.LTrim(const aString: ANSIString): ANSIString;
   var
     chars: PANSIChar absolute aString;
     i: Integer;
@@ -5514,7 +5514,7 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function ANSIFn.TrimLeft(const aString: ANSIString;
+  class function ANSIFn.LTrim(const aString: ANSIString;
                                     aChar: ANSIChar): ANSIString;
   var
     chars: PANSIChar absolute aString;
@@ -5538,7 +5538,7 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function ANSIFn.TrimLeft(const aString: ANSIString;
+  class function ANSIFn.LTrim(const aString: ANSIString;
                                     aCount: Integer): ANSIString;
   begin
     Contract.Minimum(aCount, 0);
@@ -5549,7 +5549,7 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function ANSIFn.TrimRight(const aString: ANSIString): ANSIString;
+  class function ANSIFn.RTrim(const aString: ANSIString): ANSIString;
   var
     chars: PANSIChar absolute aString;
     i: Integer;
@@ -5569,7 +5569,7 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function ANSIFn.TrimRight(const aString: ANSIString;
+  class function ANSIFn.RTrim(const aString: ANSIString;
                                         aChar: ANSIChar): ANSIString;
   var
     chars: PANSIChar absolute aString;
@@ -5590,15 +5590,15 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function ANSIFn.TrimRight(const aString: ANSIString;
+  class function ANSIFn.RTrim(const aString: ANSIString;
                                         aChar: WIDEChar): ANSIString;
   begin
-    result := TrimRight(aString, ANSI(aChar));
+    result := RTrim(aString, ANSI(aChar));
   end;
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function ANSIFn.TrimRight(const aString: ANSIString;
+  class function ANSIFn.RTrim(const aString: ANSIString;
                                         aCount: Integer): ANSIString;
   var
     len: Integer;
@@ -5618,7 +5618,7 @@ implementation
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   class function ANSIFn.Trim(const aString: ANSIString): ANSIString;
   begin
-    result := TrimRight(TrimLeft(aString));
+    result := RTrim(LTrim(aString));
   end;
 
 
@@ -5626,7 +5626,7 @@ implementation
   class function ANSIFn.Trim(const aString: ANSIString;
                                    aChar: ANSIChar): ANSIString;
   begin
-    result := TrimRight(TrimLeft(aString, aChar), aChar);
+    result := RTrim(LTrim(aString, aChar), aChar);
   end;
 
 

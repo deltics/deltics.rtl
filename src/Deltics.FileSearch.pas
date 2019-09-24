@@ -211,7 +211,7 @@ implementation
           if dir = '' then
             BREAK;
 
-          dir := STR.TrimRight(dir, '\');
+          dir := STR.RTrim(dir, '\');
 
           for i := 0 to High(fPatterns) do
             Find(dir, fPatterns[i], FALSE);
