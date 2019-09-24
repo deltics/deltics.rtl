@@ -15,7 +15,7 @@ implementation
   function Init(var aBuffer: PWIDEChar;
                 var aLen: Integer;
                 var aBase: Integer;
-                var aNeg: Boolean): Boolean; inline;
+                var aNeg: Boolean): Boolean;
   begin
     while (aLen > 0) and (aBuffer[0] = ' ') do
     begin

@@ -57,8 +57,6 @@ implementation
       {$endif}
     {$endif}
 
-  var
-    s: String;
   begin
     case aValue.VType of
       vtBoolean,
@@ -224,6 +222,7 @@ implementation
     strs: TStringArray;
   begin
     result := '';
+    SetLength(strs, 0);
     if Length(aElements) = 0 then
       EXIT;
 

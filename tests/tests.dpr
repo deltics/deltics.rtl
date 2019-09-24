@@ -18,6 +18,7 @@ uses
   Deltics.CSV.StreamReader in '..\src\Deltics.CSV.StreamReader.pas',
   Deltics.DateUtils in '..\src\Deltics.DateUtils.pas',
   Deltics.Delphi.Versions in '..\src\Deltics.Delphi.Versions.pas',
+  Deltics.Exceptions in '..\src\Deltics.Exceptions.pas',
   Deltics.FileSearch in '..\src\Deltics.FileSearch.pas',
   Deltics.FileSystem.FileList in '..\src\Deltics.FileSystem.FileList.pas',
   Deltics.FileSystem.SearchPath in '..\src\Deltics.FileSystem.SearchPath.pas',
@@ -60,6 +61,10 @@ uses
   Deltics.Strings.Parsers.ANSI.AsDatetime in '..\src\Deltics.Strings.Parsers.ANSI.AsDatetime.pas',
   Deltics.Strings.Parsers.ANSI.AsInteger in '..\src\Deltics.Strings.Parsers.ANSI.AsInteger.pas',
   Deltics.Strings.Parsers.ANSI in '..\src\Deltics.Strings.Parsers.ANSI.pas',
+  Deltics.Strings.Parsers.WIDE.AsBoolean in '..\src\Deltics.Strings.Parsers.WIDE.AsBoolean.pas',
+  Deltics.Strings.Parsers.WIDE.AsDatetime in '..\src\Deltics.Strings.Parsers.WIDE.AsDatetime.pas',
+  Deltics.Strings.Parsers.WIDE.AsInteger in '..\src\Deltics.Strings.Parsers.WIDE.AsInteger.pas',
+  Deltics.Strings.Parsers.WIDE in '..\src\Deltics.Strings.Parsers.WIDE.pas',
   Deltics.Strings in '..\src\Deltics.Strings.pas',
   Deltics.Strings.StringBuilder in '..\src\Deltics.Strings.StringBuilder.pas',
   Deltics.Strings.StringList in '..\src\Deltics.Strings.StringList.pas',
@@ -78,10 +83,13 @@ uses
   Deltics.Unicode in '..\src\Deltics.Unicode.pas',
   Deltics.Uri in '..\src\Deltics.Uri.pas',
   Deltics.VersionInfo in '..\src\Deltics.VersionInfo.pas',
+{$ifdef __DELPHI2009}
   Deltics.VMT in '..\src\Deltics.VMT.pas',
+{$endif}
+{$ifdef DELPHIXE4__}
   Deltics.Windows.Canvas in '..\src\Deltics.Windows.Canvas.pas',
-  Deltics.Windows in '..\src\Deltics.Windows.pas',
-  Deltics.Exceptions in '..\src\Deltics.Exceptions.pas';
+{$endif}
+  Deltics.Windows in '..\src\Deltics.Windows.pas';
 
 begin
 end.
