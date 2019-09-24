@@ -195,6 +195,7 @@ interface
   ASCIIClass  = class of ASCIIFn;
 
   function ANSI: ANSIClass; overload; {$ifdef InlineMethods} inline; {$endif}
+  function ANSI(aBuffer: PANSIChar; aLen: Integer): ANSIString; overload;
   function ANSI(aInteger: Integer): ANSIString; overload;
   function ANSI(aChar: ANSIChar): ANSIChar; overload;
   function ANSI(aChar: WIDEChar): ANSIChar; overload;
@@ -438,6 +439,13 @@ implementation
   function ANSI: ANSIClass;
   begin
     result := ANSIFn;
+  end;
+
+  function ANSI(aBuffer: PANSIChar; aLen: Integer): ANSIString;
+  begin
+    SetLength(result, aLen);
+    if aLen > 0 then
+      Move(aBuffer^, result[1], aLen);
   end;
 
   function ANSI(aChar: ANSIChar): ANSIChar;

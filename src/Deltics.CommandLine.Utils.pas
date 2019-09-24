@@ -101,7 +101,7 @@ implementation
      command-line switch (i.e. begins with a '-' character).
   }
   begin
-    result := (aString.Length > 1) and (aString[1] = '-');
+    result := (Length(aString) > 1) and (aString[1] = '-');
   end;
 
 

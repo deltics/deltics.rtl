@@ -229,7 +229,7 @@ implementation
     for i := 0 to Pred(get_Count) do
     begin
       aSwitch := get_Item(i);
-      result  := aSwitch.get_Name.EqualsText(aString);
+      result  := STR.SameText(aSwitch.get_Name, aString);
       if result then
         EXIT;
 
@@ -239,7 +239,7 @@ implementation
 
       for j := 0 to Pred(alts.Count) do
       begin
-        result  := alts[j].EqualsText(aString);
+        result  := STR.SameText(alts[j], aString);
         if result then
           EXIT;
       end;
@@ -252,18 +252,18 @@ implementation
     begin
       param := cmd.Params[i];
 
-      if NOT param.BeginsWith('-') then
+      if NOT STR.BeginsWith(param, '-') then
         CONTINUE;
 
       STR.DeleteLeft(param, 1);
 
-      if NOT param.BeginsWithText(aString) then
+      if NOT STR.BeginsWithText(param, aString) then
         CONTINUE;
 
       STR.DeleteLeft(param, aString);
-      result := param.IsEmpty or (ANSIChar(param[1]) in [':', '=']);
+      result := STR.IsEmpty(param) or (ANSIChar(param[1]) in [':', '=']);
 
-      if result AND param.IsEmpty then
+      if result AND STR.IsEmpty(param) then
         EXIT;
 
       STR.DeleteLeft(param, 1);

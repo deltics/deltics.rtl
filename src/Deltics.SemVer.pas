@@ -135,6 +135,7 @@ implementation
   uses
     Math,
     SysUtils,
+    Deltics.Exceptions,
     Deltics.StringTemplates;
 
 
@@ -434,7 +435,7 @@ implementation
 
     fItems := TStringList.Create;
 
-    if aString.IsEmpty then
+    if STR.IsEmpty(aString) then
       EXIT;
 
     STR.Split(aString, '.', idents);

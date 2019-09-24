@@ -2,11 +2,13 @@
 
   unit Deltics.FileSystem.Utils;
 
+{$i deltics.rtl.inc}
 
 interface
 
   uses
     SysUtils,
+    Deltics.Exceptions,
     Deltics.Strings,
     Deltics.Uri;
 
@@ -40,6 +42,21 @@ implementation
 
 
   function ConstArgAsString(aValue: TVarRec): String;
+
+    {$ifdef __DELPHIXE}
+      {$ifdef CPU32BITS}
+        function IntPtr(aPointer: Pointer): Integer;
+        begin
+          result := Integer(aPointer);
+        end;
+      {$else}
+        function IntPtr(aPointer: Pointer): Int64;
+        begin
+          result := Int64(aPointer);
+        end;
+      {$endif}
+    {$endif}
+
   var
     s: String;
   begin
@@ -83,6 +100,7 @@ implementation
         result := STR.FromBuffer(PWIDEChar(aValue.VWideString));
     {$ENDIF !NEXTGEN}
 
+    {$ifdef DELPHI 2009__}
       vtVariant:
         if Assigned(System.VarToUStrProc) then
         begin
@@ -90,11 +108,12 @@ implementation
           result := s;
         end;
 
-      vtInt64:
-        result := IntToStr(aValue.VInt64^);
-
       vtUnicodeString:
         result := UnicodeString(aValue.VUnicodeString);
+    {$endif}
+
+      vtInt64:
+        result := IntToStr(aValue.VInt64^);
     end;
   end;
 
@@ -135,7 +154,7 @@ implementation
       base := Path.CurrentDir;
 
     // If it is a sub-directory of the base path then we can just remove the base path
-    if aPath.BeginsWithText(base) then
+    if STR.BeginsWithText(aPath, base) then
     begin
       result := Copy(aPath, Length(base) + 2, Length(aPath) - Length(base));
       EXIT;
@@ -154,7 +173,7 @@ implementation
       else
         nav := '..';
 
-      if aPath.BeginsWithText(stem) then
+      if STR.BeginsWithText(aPath, stem) then
       begin
         result := nav + '\' + Copy(aPath, Length(stem) + 2, Length(aPath) - Length(stem) + 1);
         BREAK;
@@ -342,7 +361,7 @@ implementation
         result := cd + '\' + aRelativePath;
 
     finally
-      if (Length(result) > 0) and result.EndsWith('\') then
+      if (Length(result) > 0) and STR.EndsWith(result, '\') then
         STR.DeleteRight(result, 1);
     end;
   end;
@@ -412,9 +431,9 @@ implementation
 
     fileOp.Wnd    := 0;
     fileOp.wFunc  := FO_COPY;
-    fileOp.pFrom  := PWIDEChar(srcFileDnt);
-    fileOp.pTo    := PWIDEChar(destFileDnt);
-    fileOp.fFlags := FOF_NO_UI;
+    fileOp.pFrom  := PChar(srcFileDnt);
+    fileOp.pTo    := PChar(destFileDnt);
+    fileOp.fFlags := FOF_SILENT;
     fileOp.lpszProgressTitle  := NIL;
 
     copyResult := ShFileOperation(fileOp);

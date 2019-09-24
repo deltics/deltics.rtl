@@ -12,6 +12,7 @@ interface
     SysUtils,
     Windows,
     Deltics.Classes,
+    Deltics.Strings.Parsers.ANSI,
     Deltics.Strings.Types;
 
 
@@ -32,7 +33,9 @@ interface
       class procedure CopyToBuffer(const aString: ANSIString; aMaxBytes: Integer; aBuffer: Pointer; aOffset: Integer); overload;
 
     public
-      // Transcoding
+      class function Parse: ANSIParserClass;
+
+      // Transcoding
       class function Encode(const aString: String): ANSIString;
       class function FromString(const aString: String): ANSIString;
       class function FromUTF8(const aString: UTF8String): ANSIString; overload;
@@ -46,7 +49,8 @@ interface
       class procedure CopyToBuffer(const aString: ANSIString; aBuffer: Pointer; aMaxChars: Integer); overload;
       class procedure CopyToBufferOffset(const aString: ANSIString; aBuffer: Pointer; aByteOffset: Integer); overload;
       class procedure CopyToBufferOffset(const aString: ANSIString; aBuffer: Pointer; aByteOffset: Integer; aMaxChars: Integer); overload;
-      class function FromBuffer(aBuffer: PANSIChar; aLen: Integer = -1): ANSIString;
+      class function FromBuffer(aBuffer: PANSIChar; aLen: Integer = -1): ANSIString; overload;
+      class function FromBuffer(aBuffer: PWIDEChar; aLen: Integer = -1): ANSIString; overload;
       class function Len(aBuffer: PANSIChar): Integer;
 
       // Misc utilities
@@ -73,15 +77,23 @@ interface
       class function StringOf(aChar: WIDEChar; aCount: Integer): ANSIString; overload;
       class function StringOf(const aString: ANSIString; aCount: Integer): ANSIString; overload;
 
+      // Type conversions
+      class function AsBoolean(const aString: ANSIString): Boolean; overload;
+      class function AsBoolean(const aString: ANSIString; aDefault: Boolean): Boolean; overload;
+      class function AsInteger(const aString: ANSIString): Integer; overload;
+      class function AsInteger(const aString: ANSIString; aDefault: Integer): Integer; overload;
+      class function IsBoolean(const aString: ANSIString): Boolean; overload;
+      class function IsBoolean(const aString: ANSIString; var aValue: Boolean): Boolean; overload;
+      class function IsInteger(const aString: ANSIString): Boolean; overload;
+      class function IsInteger(const aString: ANSIString; var aValue: Integer): Boolean; overload;
+
       // Testing things about a string
       class function IsAlpha(aChar: ANSIChar): Boolean; overload;
       class function IsAlpha(const aString: ANSIString): Boolean; overload;
       class function IsAlphaNumeric(aChar: ANSIChar): Boolean; overload;
       class function IsAlphaNumeric(const aString: ANSIString): Boolean; overload;
       class function IsEmpty(const aString: ANSIString): Boolean;
-      class function IsInteger(aBuffer: PANSIChar; aLen: Integer): Boolean; overload;
-      class function IsInteger(const aString: ANSIString): Boolean; overload;
-      class function IsLowercase(const aChar: ANSIChar): Boolean; overload;
+      class function IsLowercase(const aChar: ANSIChar): Boolean; overload;
       class function IsLowercase(const aString: ANSIString): Boolean; overload;
       class function IsNull(aChar: ANSIChar): Boolean;
       class function IsNumeric(aChar: ANSIChar): Boolean; overload;
@@ -442,6 +454,15 @@ implementation
 
 
 { ANSIFn ------------------------------------------------------------------------------------------ }
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function ANSIFn.Parse: ANSIParserClass;
+  begin
+    result := ANSIParser;
+  end;
+
+
+
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   class function ANSIFn.AddressOfByte(aBase: Pointer;
@@ -969,6 +990,16 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function ANSIFn.FromBuffer(aBuffer: PWIDEChar;
+                                   aLen: Integer): ANSIString;
+  begin
+    Contract.Minimum(aLen, -1);
+
+    result := STR.FromWIDE(WIDE.FromBuffer(aBuffer, aLen));
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   class function ANSIFn.Len(aBuffer: PANSIChar): Integer;
   begin
   {$ifdef DELPHIXE4__}
@@ -1046,56 +1077,6 @@ implementation
   class function ANSIFn.IsEmpty(const aString: ANSIString): Boolean;
   begin
     result := Length(aString) = 0;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function ANSIFn.IsInteger(aBuffer: PANSIChar;
-                                  aLen: Integer): Boolean;
-  var
-    i: Integer;
-    pc: PANSIChar;
-  begin
-    pc := aBuffer;
-    while (aLen > 0) and (pc^ = ' ') do
-    begin
-      Inc(pc);
-      Dec(aLen);
-    end;
-
-    while (aLen > 0) and (pc[aLen - 1] = ' ') do
-      Dec(aLen);
-
-    case aLen of
-      0 : result := FALSE;
-
-      1 : begin
-            result := (pc^ in ['0'..'9']);
-            EXIT;
-          end;
-    else
-      result := (pc^ in ['+', '-', '0'..'9']);
-      if NOT result then
-        EXIT;
-    end;
-
-    Inc(pc);
-
-    for i := 1 to Pred(aLen) do
-    begin
-      result := (pc^ in ['0'..'9']);
-      if NOT result then
-        EXIT;
-
-      Inc(pc);
-    end;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function ANSIFn.IsInteger(const aString: ANSIString): Boolean;
-  begin
-    result := IsInteger(PANSIChar(aString), Length(aString));
   end;
 
 
@@ -5086,6 +5067,66 @@ implementation
     end
     else
       result := '';
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function ANSIFn.AsBoolean(const aString: ANSIString): Boolean;
+  begin
+    result := Parse.AsBoolean(PANSIChar(aString), Length(aString));
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function ANSIFn.AsBoolean(const aString: ANSIString;
+                                        aDefault: Boolean): Boolean;
+  begin
+    result := Parse.AsBoolean(PANSIChar(aString), Length(aString), aDefault);
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function ANSIFn.AsInteger(const aString: ANSIString): Integer;
+  begin
+    result := Parse.AsInteger(PANSIChar(aString), Length(aString));
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function ANSIFn.AsInteger(const aString: ANSIString;
+                                        aDefault: Integer): Integer;
+  begin
+    result := Parse.AsInteger(PANSIChar(aString), Length(aString), aDefault);
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function ANSIFn.IsBoolean(const aString: ANSIString): Boolean;
+  begin
+    result := Parse.IsBoolean(PANSIChar(aString), Length(aString));
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function ANSIFn.IsBoolean(const aString: ANSIString;
+                                  var   aValue: Boolean): Boolean;
+  begin
+    result := Parse.IsBoolean(PANSIChar(aString), Length(aString), aValue);
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function ANSIFn.IsInteger(const aString: ANSIString): Boolean;
+  begin
+    result := Parse.IsInteger(PANSIChar(aString), Length(aString));
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function ANSIFn.IsInteger(const aString: ANSIString;
+                                  var   aValue: Integer): Boolean;
+  begin
+    result := Parse.IsInteger(PANSIChar(aString), Length(aString), aValue);
   end;
 
 

@@ -56,10 +56,10 @@ uses
   Deltics.Strings.Encoding.UTF8 in '..\src\Deltics.Strings.Encoding.UTF8.pas',
   Deltics.Strings.Encoding.UTF16 in '..\src\Deltics.Strings.Encoding.UTF16.pas',
   Deltics.Strings.Encoding.UTF32 in '..\src\Deltics.Strings.Encoding.UTF32.pas',
-  Deltics.Strings.Parsers.WIDE.AsBoolean in '..\src\Deltics.Strings.Parsers.WIDE.AsBoolean.pas',
-  Deltics.Strings.Parsers.WIDE.AsDatetime in '..\src\Deltics.Strings.Parsers.WIDE.AsDatetime.pas',
-  Deltics.Strings.Parsers.WIDE.AsInteger in '..\src\Deltics.Strings.Parsers.WIDE.AsInteger.pas',
-  Deltics.Strings.Parsers.WIDE in '..\src\Deltics.Strings.Parsers.WIDE.pas',
+  Deltics.Strings.Parsers.ANSI.AsBoolean in '..\src\Deltics.Strings.Parsers.ANSI.AsBoolean.pas',
+  Deltics.Strings.Parsers.ANSI.AsDatetime in '..\src\Deltics.Strings.Parsers.ANSI.AsDatetime.pas',
+  Deltics.Strings.Parsers.ANSI.AsInteger in '..\src\Deltics.Strings.Parsers.ANSI.AsInteger.pas',
+  Deltics.Strings.Parsers.ANSI in '..\src\Deltics.Strings.Parsers.ANSI.pas',
   Deltics.Strings in '..\src\Deltics.Strings.pas',
   Deltics.Strings.StringBuilder in '..\src\Deltics.Strings.StringBuilder.pas',
   Deltics.Strings.StringList in '..\src\Deltics.Strings.StringList.pas',
@@ -78,11 +78,10 @@ uses
   Deltics.Unicode in '..\src\Deltics.Unicode.pas',
   Deltics.Uri in '..\src\Deltics.Uri.pas',
   Deltics.VersionInfo in '..\src\Deltics.VersionInfo.pas',
-{$ifNdef DELPHI2010__}
   Deltics.VMT in '..\src\Deltics.VMT.pas',
-{$endif}
   Deltics.Windows.Canvas in '..\src\Deltics.Windows.Canvas.pas',
-  Deltics.Windows in '..\src\Deltics.Windows.pas';
+  Deltics.Windows in '..\src\Deltics.Windows.pas',
+  Deltics.Exceptions in '..\src\Deltics.Exceptions.pas';
 
 begin
 end.

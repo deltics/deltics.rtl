@@ -8,6 +8,7 @@ interface
   uses
     SysUtils,
     Deltics.Classes,
+    Deltics.DateUtils,
     Deltics.Strings,
     Deltics.Unicode;
 
@@ -43,7 +44,7 @@ interface
 
     TValue = class
     private
-      fData: PChar;
+      fData: PWIDEChar;
       fDataLen: Integer;
       function get_AsANSI: ANSIString;
       function get_AsANSIChar: ANSIChar;
@@ -54,7 +55,7 @@ interface
       function get_HasValue: Boolean;
       function get_IsNull: Boolean;
     public
-      constructor Create(aData: PChar; aLen: Integer);
+      constructor Create(aData: PWIDEChar; aLen: Integer);
       function AsDate: TDate; overload;
       function AsDate(const aFormat: String): TDate; overload;
       function IsANSIChar: Boolean; overload;
@@ -81,7 +82,6 @@ interface
 implementation
 
   uses
-    Deltics.DateUtils,
     Deltics.Strings.Parsers.WIDE;
 
 
@@ -251,7 +251,7 @@ implementation
 
 { TValue }
 
-  constructor TValue.Create(aData: PChar;
+  constructor TValue.Create(aData: PWIDEChar;
                             aLen: Integer);
   begin
     inherited Create;

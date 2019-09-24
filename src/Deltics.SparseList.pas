@@ -118,7 +118,7 @@ interface
     protected
       procedure DoGetItemClass(var aClass: TSparseListItemClass); override;
     public
-      procedure Add(const aKey: Int64; const aValue: String);
+      procedure Add(const aKey: Int64; const aValue: UnicodeString);
       property Items[const aKey: Int64]: UnicodeString read get_Item write set_Item; default;
     end;
 
