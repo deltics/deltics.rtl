@@ -7,7 +7,7 @@ steps:
     $exe = Join-Path '.bin' 'tests.${{ parameters.delphiVersion }}.${{ parameters.platform }}.exe'
     if (-Not(Test-Path $exe))
     {
-        Write-Host '##vso[task.complete result=skipped]Test executable for Delphi ${{ parameters.delphiVersion }} (${{ parameters.platform }}) not found.'
+        Write-Host '##vso[task.complete result=Skipped;]Test executable for Delphi ${{ parameters.delphiVersion }} (${{ parameters.platform }}) not found.'
     }
     else
     {
