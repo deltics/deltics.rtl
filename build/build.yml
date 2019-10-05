@@ -9,84 +9,19 @@ pr:
 
 resources:
   repositories:
-    - repository: templates
+    - repository: github
       type: github
       name: deltics/azure-pipeline-templates
       endpoint: GitHubTemplates
+      ref: refs/heads/develop
+    - repository: congress
+      type: git
+      name: congress/templates
       ref: refs/heads/develop
 
 pool:
   name: $(AgentPool)
   demands: Delphi
 
-variables:
-  dugetLogLevel: info
-
 jobs:
-- job: GitVersion
-  steps:
-  - template: gitversion.yml@templates
-
-- job: Build
-  condition: and(succeededOrFailed(), eq(variables['IncludeBuild'], 'yes'))
-  steps:
-  - script: |
-      duget init --log:$(DugetLogLevel)
-      duget restore --path tests --log:$(DugetLogLevel)
-    displayName: 'Restore Duget dependencies'
-
-  - template: build-all.yml
-    parameters:
-      delphiVersions: [ 7, 2005, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
-
-  - template: build-all.yml
-    parameters:
-      delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
-      platform: x64
-
-- job: Test
-  condition: and(succeededOrFailed(), eq(variables['IncludeTestRuns'], 'yes'))
-  dependsOn:
-  - GitVersion
-  - Build
-  variables:
-    SemVer: $[ dependencies.GitVersion.outputs['GitVersion.SemVer'] ]
-  steps:
-  - template: test-all.yml
-    parameters:
-      delphiVersions: [ 7, 2005, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
-
-  - template: test-all.yml
-    parameters:
-      delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
-      platform: x64
-
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFormat: XUnit
-      testResultsFiles: '*.xml'
-      searchFolder: '.results'
-      testRunTitle: Build $(SemVer)
-    condition: succeededOrFailed()
-
-- job: Packaging
-  condition: and(or(and(eq(variables['IncludeTestRuns'], 'yes'), succeededOrFailed()), always()), eq(variables['IncludePackaging'], 'yes'))
-  dependsOn:
-  - GitVersion
-  - Build
-  - Test
-  variables:
-    SemVer: $[ dependencies.GitVersion.outputs['GitVersion.SemVer'] ]
-    PreReleaseLabel: $[ dependencies.GitVersion.outputs['GitVersion.PreReleaseLabel'] ]
-  steps:
-  - powershell: duget pack --version $(SemVer) --log:$(DugetLogLevel)
-    displayName: Create Duget package
-
-  - powershell: |
-      $feed = '$(PreReleaseLabel)'
-      if ($feed -eq '') {
-        $feed = 'release'
-      }
-      duget push --feed:$feed --log:$(DugetLogLevel)
-    displayName: Publish Duget package
-    
+- template: build.yml@congress
