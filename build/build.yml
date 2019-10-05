@@ -16,6 +16,7 @@ resources:
 
 pool:
   name: $(AgentPool)
+  demands: Delphi
 
 variables:
   dugetLogLevel: info
