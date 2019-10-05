@@ -45,7 +45,6 @@ jobs:
   condition: and(succeededOrFailed(), eq(variables['IncludeBuild'], 'yes'))
 
 - job: Test
-  dependsOn: Build
   steps:
   - template: test-all.yml
     parameters:
