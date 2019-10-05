@@ -28,8 +28,8 @@ jobs:
   - template: gitversion.yml@templates
 
   - script: |
-      duget init
-      duget restore --path tests
+      duget init --log:$(dugetLogLevel)
+      duget restore --path tests --log:$(dugetLogLevel)
     displayName: 'Restore Duget dependencies'
 
 - job: Build
@@ -66,7 +66,7 @@ jobs:
 
 - job: Packaging
   steps:
-  - powershell: duget pack --version $(gitversion)
+  - powershell: duget pack --version $(gitversion) --log:$(dugetLogLevel)
     displayName: Create Duget package
 
   - powershell: |
@@ -74,6 +74,6 @@ jobs:
       if ($feed -eq '') {
           $feed = 'release'
       }
-      duget push --feed:$feed
+      duget push --feed:$feed --log:$(dugetLogLevel)
     displayName: Publish Duget package
   condition: and(succeededOrFailed(), eq(variables['IncludePackaging'], 'yes'))    
