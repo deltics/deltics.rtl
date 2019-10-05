@@ -59,7 +59,7 @@ steps:
   displayName: Create Duget package
 
 - powershell: |
-    $feed = $(gitversionprelabel)
+    $feed = '$(gitversionprelabel)'
     if ($feed -eq '') {
         $feed = 'release'
     }
