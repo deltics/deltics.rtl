@@ -47,7 +47,7 @@
 
 {$i deltics.rtl.inc}
 
-{$ifdef deltics_versioninfo}
+{$ifdef debugDelticsVersioninfo}
   {$debuginfo ON}
 {$else}
   {$debuginfo OFF}
@@ -434,7 +434,7 @@ implementation
     // Determine required buffer size (0 if no version info)
     dwSize := GetFileVersionInfoSize(PChar(fFileName), dwDummy);
     if (dwSize = 0) then
-      EXIT;
+      RaiseLastOSError;
 
     // Allocate a buffer for and read version info from the required file
     GetMem(fVersionInfo, dwSize);

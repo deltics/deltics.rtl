@@ -995,7 +995,7 @@ implementation
   begin
     Contract.Minimum(aLen, -1);
 
-    result := STR.FromWIDE(WIDE.FromBuffer(aBuffer, aLen));
+    result := ANSI.FromWIDE(WIDE.FromBuffer(aBuffer, aLen));
   end;
 
 
