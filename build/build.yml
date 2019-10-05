@@ -22,54 +22,55 @@ pool:
 variables:
   dugetLogLevel: info
 
-steps:
-- template: gitversion.yml@templates
+jobs:
+- job: Preparation
+  steps:
+  - template: gitversion.yml@templates
 
-- script: |
-    duget init
-    duget restore --path tests
-  displayName: 'Restore Duget dependencies'
+  - script: |
+      duget init
+      duget restore --path tests
+    displayName: 'Restore Duget dependencies'
 
-- template: build-all.yml
-  parameters:
-    delphiVersions: [ 7, 2005, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
-    condition: and(succeededOrFailed(), eq(variables['IncludeBuild'], 'yes'))
+- job: Build
+  - template: build-all.yml
+    parameters:
+      delphiVersions: [ 7, 2005, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
 
-- template: build-all.yml
-  parameters:
-    delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
-    platform: x64
-    condition: and(succeededOrFailed(), eq(variables['IncludeBuild'], 'yes'))
+  - template: build-all.yml
+    parameters:
+      delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
+      platform: x64
+  condition: and(succeededOrFailed(), eq(variables['IncludeBuild'], 'yes'))
 
-- template: test-all.yml
-  parameters:
-    delphiVersions: [ 7, 2005, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
-    condition: and(succeededOrFailed(), eq(variables['IncludeTest'], 'yes'))
+- job: Test
+  - template: test-all.yml
+    parameters:
+      delphiVersions: [ 7, 2005, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
 
-- template: test-all.yml
-  parameters:
-    delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
-    platform: x64
-    condition: and(succeededOrFailed(), eq(variables['IncludeTest'], 'yes'))
+  - template: test-all.yml
+    parameters:
+      delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
+      platform: x64
 
-- task: PublishTestResults@2
-  inputs:
-    testResultsFormat: XUnit
-    testResultsFiles: '*.xml'
-    searchFolder: '.results'
-    testRunTitle: Build $(gitversion)
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: XUnit
+      testResultsFiles: '*.xml'
+      searchFolder: '.results'
+      testRunTitle: Build $(gitversion)
+      condition: succeededOrFailed()
   condition: and(succeededOrFailed(), eq(variables['IncludeTest'], 'yes'))
 
-- powershell: duget pack --version $(gitversion)
-  displayName: Create Duget package
-  condition: and(succeeded(), eq(variables['IncludePackaging'], 'yes'))
+- job: Packaging
+  - powershell: duget pack --version $(gitversion)
+    displayName: Create Duget package
 
-- powershell: |
-    $feed = '$(gitversionprelabel)'
-    if ($feed -eq '') {
-        $feed = 'release'
-    }
-    duget push --feed:$feed
-  displayName: Publish Duget package
-  condition: and(succeeded(), eq(variables['IncludePackaging'], 'yes'))
-    
+  - powershell: |
+      $feed = '$(gitversionprelabel)'
+      if ($feed -eq '') {
+          $feed = 'release'
+      }
+      duget push --feed:$feed
+    displayName: Publish Duget package
+  condition: and(succeededOrFailed(), eq(variables['IncludePackaging'], 'yes'))    
