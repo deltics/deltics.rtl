@@ -55,6 +55,7 @@ jobs:
       delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
       platform: x64
 
+  - template: gitversion.yml@templates
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: XUnit
@@ -66,6 +67,8 @@ jobs:
 
 - job: Packaging
   steps:
+  - template: gitversion.yml@templates
+
   - powershell: duget pack --version $(gitversion) --log:$(DugetLogLevel)
     displayName: Create Duget package
 
