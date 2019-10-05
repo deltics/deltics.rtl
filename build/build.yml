@@ -23,8 +23,7 @@ variables:
   dugetLogLevel: info
 
 jobs:
-- job: Prep
-  name: GitVersion
+- job: GitVersion
   steps:
   - template: gitversion.yml@templates
 
@@ -47,7 +46,9 @@ jobs:
 
 - job: Test
   condition: and(succeededOrFailed(), eq(variables['IncludeTestRuns'], 'yes'))
-  dependsOn: GitVersion
+  dependsOn:
+  - GitVersion
+  - Build
   variables:
     SemVer: $[ dependencies.GitVersion.outputs['SemVer'] ]
   steps:
@@ -70,7 +71,10 @@ jobs:
 
 - job: Packaging
   condition: and(succeededOrFailed(), eq(variables['IncludePackaging'], 'yes'))
-  dependsOn: GitVersion
+  dependsOn:
+  - GitVersion
+  - Build
+  - Test
   variables:
     SemVer: $[ dependencies.GitVersion.outputs['SemVer'] ]
     PreReleaseLabel: $[ dependencies.GitVersion.outputs['PreReleaseLabel'] ]
