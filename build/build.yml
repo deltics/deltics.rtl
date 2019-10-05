@@ -28,6 +28,7 @@ jobs:
   - template: gitversion.yml@templates
 
 - job: Build
+  condition: and(succeededOrFailed(), eq(variables['IncludeBuild'], 'yes'))
   steps:
   - script: |
       duget init --log:$(DugetLogLevel)
@@ -42,9 +43,11 @@ jobs:
     parameters:
       delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
       platform: x64
-  condition: and(succeededOrFailed(), eq(variables['IncludeBuild'], 'yes'))
 
 - job: Test
+  condition: and(succeededOrFailed(), eq(variables['IncludeTestRuns'], 'yes'))
+  variables:
+    GitVersion: $[ GitVersion.outputs['SemVer'] ]
   steps:
   - template: test-all.yml
     parameters:
@@ -55,20 +58,19 @@ jobs:
       delphiVersions: [ xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
       platform: x64
 
-  - template: gitversion.yml@templates
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: XUnit
       testResultsFiles: '*.xml'
       searchFolder: '.results'
       testRunTitle: Build $(gitversion)
-      condition: succeededOrFailed()
-  condition: and(succeededOrFailed(), eq(variables['IncludeTestRuns'], 'yes'))
+    condition: succeededOrFailed()
 
 - job: Packaging
+  condition: and(succeededOrFailed(), eq(variables['IncludePackaging'], 'yes'))
+  variables:
+    GitVersion: $[ GitVersion.outputs['SemVer'] ]
   steps:
-  - template: gitversion.yml@templates
-
   - powershell: duget pack --version $(gitversion) --log:$(DugetLogLevel)
     displayName: Create Duget package
 
@@ -79,5 +81,4 @@ jobs:
       }
       duget push --feed:$feed --log:$(DugetLogLevel)
     displayName: Publish Duget package
-  condition: and(succeededOrFailed(), eq(variables['IncludePackaging'], 'yes'))
     
