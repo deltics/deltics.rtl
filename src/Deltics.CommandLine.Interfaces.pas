@@ -58,6 +58,7 @@ interface
     ['{CF183564-7D32-49A3-9A3D-C31DB9E4B378}']
       function get_Count: Integer;
       function get_Item(const aIndex: Integer): ICommandLineSwitch;
+      function Contains(const aString: String; var aSwitch: ICommandLineSwitch): Boolean; overload;
       function Contains(const aSwitch: String; var aValue: String): Boolean; overload;
       function Contains(const aSwitch: String; var aValues: IStringList): Boolean; overload;
       property Count: Integer read get_Count;

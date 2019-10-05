@@ -49,7 +49,7 @@ interface
     private
       fCommandLine: TWeakInterface;
       procedure AddSwitch(const aSwitch: String; const aValues: IStringList);
-    function get_CommandLine: ICommandLine;
+      function get_CommandLine: ICommandLine;
     public
       constructor Create(const aCommandLine: ICommandLine);
       property CommandLine: ICommandLine read get_CommandLine;
