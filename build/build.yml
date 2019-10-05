@@ -46,8 +46,9 @@ jobs:
 
 - job: Test
   condition: and(succeededOrFailed(), eq(variables['IncludeTestRuns'], 'yes'))
+  dependsOn: GitVersion
   variables:
-    GitVersion: $[ GitVersion.outputs['SemVer'] ]
+    SemVer: $[ dependencies.GitVersion.outputs['SemVer'] ]
   steps:
   - template: test-all.yml
     parameters:
@@ -63,19 +64,21 @@ jobs:
       testResultsFormat: XUnit
       testResultsFiles: '*.xml'
       searchFolder: '.results'
-      testRunTitle: Build $(gitversion)
+      testRunTitle: Build $(SemVer)
     condition: succeededOrFailed()
 
 - job: Packaging
   condition: and(succeededOrFailed(), eq(variables['IncludePackaging'], 'yes'))
+  dependsOn: GitVersion
   variables:
-    GitVersion: $[ GitVersion.outputs['SemVer'] ]
+    SemVer: $[ dependencies.GitVersion.outputs['SemVer'] ]
+    PreReleaseLabel: $[ dependencies.GitVersion.outputs['PreReleaseLabel'] ]
   steps:
-  - powershell: duget pack --version $(gitversion) --log:$(DugetLogLevel)
+  - powershell: duget pack --version $(SemVer) --log:$(DugetLogLevel)
     displayName: Create Duget package
 
   - powershell: |
-      $feed = '$(gitversionprelabel)'
+      $feed = '$(PreReleaseLabel)'
       if ($feed -eq '') {
         $feed = 'release'
       }
