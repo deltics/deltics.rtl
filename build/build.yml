@@ -58,12 +58,11 @@ steps:
   displayName: Create Duget package
 
 - powershell: |
-    $feed = ''
-
-    if ("$(gitversion)" -like '*alpha*')    { $feed = '-feed alpha' }
-    elseif ("$(gitversion)" -like '*beta*') { $feed = '-feed beta' }
-
-    duget push $feed
+    $feed = $(gitversionprelabel)
+    if ($feed -eq '') {
+        $feed = 'release'
+    }
+    duget push --feed:$feed
 
   displayName: Publish Duget package
     
