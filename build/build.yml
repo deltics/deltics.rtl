@@ -23,5 +23,8 @@ pool:
   name: $(AgentPool)
   demands: Delphi
 
+variables:
+- template: vars.yml@congress
+
 jobs:
 - template: build.yml@congress
