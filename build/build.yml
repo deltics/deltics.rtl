@@ -33,6 +33,7 @@ jobs:
     displayName: 'Restore Duget dependencies'
 
 - job: Build
+  steps:
   - template: build-all.yml
     parameters:
       delphiVersions: [ 7, 2005, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
@@ -44,6 +45,7 @@ jobs:
   condition: and(succeededOrFailed(), eq(variables['IncludeBuild'], 'yes'))
 
 - job: Test
+  steps:
   - template: test-all.yml
     parameters:
       delphiVersions: [ 7, 2005, 2006, 2007, 2009, 2010, xe, xe2, xe3, xe4, xe5, xe6, xe7, xe8, 10, 10.1, 10.2, 10.3 ]
@@ -63,6 +65,7 @@ jobs:
   condition: and(succeededOrFailed(), eq(variables['IncludeTest'], 'yes'))
 
 - job: Packaging
+  steps:
   - powershell: duget pack --version $(gitversion)
     displayName: Create Duget package
 
