@@ -70,7 +70,7 @@ jobs:
     condition: succeededOrFailed()
 
 - job: Packaging
-  condition: and(succeededOrFailed(), eq(variables['IncludePackaging'], 'yes'))
+  condition: and(or(and(eq(variables['IncludeTestRuns'], 'yes'), succeededOrFailed()), always()), eq(variables['IncludePackaging'], 'yes'))
   dependsOn:
   - GitVersion
   - Build
