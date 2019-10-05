@@ -1,7 +1,7 @@
 
 {$i deltics.rtl.inc}
 
-  program tests;
+  program test;
 
 uses
   Deltics.Smoketest,
