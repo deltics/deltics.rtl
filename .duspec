@@ -18,7 +18,6 @@
             "src\\Deltics.Classes.pas",
             "src\\Deltics.CommandLine.pas",
             "src\\Deltics.CommandLine.Switches.pas",
-            "src\\Deltics.Contracts.Base.pas",
             "src\\Deltics.Contracts.pas",
             "src\\Deltics.CSV.StreamReader.pas",
             "src\\Deltics.DateUtils.pas",
