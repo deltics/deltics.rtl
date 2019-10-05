@@ -50,7 +50,7 @@ jobs:
   - GitVersion
   - Build
   variables:
-    SemVer: $[ dependencies.GitVersion.outputs['SemVer'] ]
+    SemVer: $[ dependencies.GitVersion.outputs['GitVersion.SemVer'] ]
   steps:
   - template: test-all.yml
     parameters:
@@ -76,8 +76,8 @@ jobs:
   - Build
   - Test
   variables:
-    SemVer: $[ dependencies.GitVersion.outputs['SemVer'] ]
-    PreReleaseLabel: $[ dependencies.GitVersion.outputs['PreReleaseLabel'] ]
+    SemVer: $[ dependencies.GitVersion.outputs['GitVersion.SemVer'] ]
+    PreReleaseLabel: $[ dependencies.GitVersion.outputs['GitVersion.PreReleaseLabel'] ]
   steps:
   - powershell: duget pack --version $(SemVer) --log:$(DugetLogLevel)
     displayName: Create Duget package
