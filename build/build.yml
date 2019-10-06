@@ -13,11 +13,9 @@ resources:
       type: github
       name: deltics/azure-pipeline-templates
       endpoint: GitHubTemplates
-      ref: refs/heads/develop
     - repository: congress
       type: git
       name: congress/templates
-      ref: refs/heads/develop
 
 pool:
   name: $(AgentPool)
