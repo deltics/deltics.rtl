@@ -9,10 +9,6 @@ pr:
 
 resources:
   repositories:
-    - repository: github
-      type: github
-      name: deltics/azure-pipeline-templates
-      endpoint: GitHubTemplates
     - repository: congress
       type: git
       name: congress/templates
