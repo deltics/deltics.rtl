@@ -136,7 +136,7 @@ implementation
     Math,
     SysUtils,
     Deltics.Exceptions,
-    Deltics.StringTemplates;
+    Deltics.Strings.Templates;
 
 
   const
@@ -171,21 +171,21 @@ implementation
   begin
     result := 0;
 
-    if a.MajorVersion < b.MajorVersion then
+    if a.MajorVersion > b.MajorVersion then
       result := -1
-    else if a.MajorVersion > b.MajorVersion then
+    else if a.MajorVersion < b.MajorVersion then
       result := 1
     else
     begin
-      if a.MinorVersion < b.MinorVersion then
+      if a.MinorVersion > b.MinorVersion then
         result := -1
-      else if a.MinorVersion > b.MinorVersion then
+      else if a.MinorVersion < b.MinorVersion then
         result := 1
       else
       begin
-        if a.Patch < b.Patch then
+        if a.Patch > b.Patch then
           result := -1
-        else if a.Patch > b.Patch then
+        else if a.Patch < b.Patch then
           result := 1
         else
         begin
@@ -198,7 +198,7 @@ implementation
             identB := identsB[i];
 
             if STR.IsInteger(identA) and STR.IsInteger(identB) then
-             result := Abs(STR.AsInteger(identB) - STR.AsInteger(identA))
+             result := Sign(STR.AsInteger(identB) - STR.AsInteger(identA))
             else if STR.IsInteger(identA) then
              result := 1
             else if STR.IsInteger(identB) then

@@ -40,7 +40,7 @@ interface
 implementation
 
   uses
-    Deltics.StringTemplates;
+    Deltics.Strings.Templates;
 
 
 { TUri }

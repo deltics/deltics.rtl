@@ -17,29 +17,24 @@ interface
     Contract = class
     public
       class procedure Assigned(const aValue);
-      class procedure NotASurrogate(aValue: WIDEChar);
-      class procedure NotEmpty(aValue: ANSIString; const aParamName: String = ''); overload;
-      class procedure NotEmpty(aValue: ANSIString; var aLen: Integer); overload;
-      class procedure NotEmpty(aValue: UnicodeString; const aParamName: String = ''); overload;
+      class procedure NotASurrogate(aValue: WideChar);
+      class procedure NotEmpty(aValue: AnsiString); overload;
+      class procedure NotEmpty(aValue: AnsiString; var aLen: Integer); overload;
+      class procedure NotEmpty(aValue: UnicodeString); overload;
       class procedure NotEmpty(aValue: UnicodeString; var aLen: Integer); overload;
-      class procedure Minimum(aValue, aFloor: Integer; const aParamName: String = '');
-      class procedure NotNull(aValue: ANSIChar); overload;
-      class procedure NotNull(aValue: WIDEChar); overload;
+      class procedure Minimum(aValue, aMinimum: Integer);
+      class procedure NotNull(aValue: AnsiChar); overload;
+      class procedure NotNull(aValue: WideChar); overload;
       class procedure NotSupported;
-      class procedure ValidIndex(const aString: ANSIString; aIndex: Integer; const aMessage: String = ''); overload;
-      class procedure ValidIndex(const aString: UnicodeString; aIndex: Integer; const aMessage: String = ''); overload;
+      class procedure ValidIndex(const aString: AnsiString; aIndex: Integer); overload;
+      class procedure ValidIndex(const aString: UnicodeString; aIndex: Integer); overload;
     end;
 
 
 
 implementation
 
-  type
-    EArgumentOutOfRangeException = class(EContractViolation);
-
-
-
-{ Contract }
+{ Contract --------------------------------------------------------------------------------------- }
 
   class procedure Contract.Assigned(const aValue);
   var
@@ -50,21 +45,22 @@ implementation
   end;
 
 
-  class procedure Contract.NotASurrogate(aValue: WIDEChar);
+  class procedure Contract.NotASurrogate(aValue: WideChar);
   begin
-    if WIDE.IsSurrogate(aValue) then
+    if Wide.IsSurrogate(aValue) then
       raise EContractViolation.Create('Argument cannot be a hi/lo surrogate');
   end;
 
 
-  class procedure Contract.NotEmpty(aValue: ANSIString; const aParamName: String);
+  class procedure Contract.NotEmpty(aValue: AnsiString);
   begin
     if aValue = '' then
       raise EContractViolation.Create('Argument cannot be an empty string');
   end;
 
 
-  class procedure Contract.NotEmpty(aValue: ANSIString; var aLen: Integer);
+  class procedure Contract.NotEmpty(    aValue: AnsiString;
+                                    var aLen: Integer);
   begin
     aLen := Length(aValue);
     if aLen = 0 then
@@ -72,14 +68,15 @@ implementation
   end;
 
 
-  class procedure Contract.NotEmpty(aValue: UnicodeString; const aParamName: String);
+  class procedure Contract.NotEmpty(aValue: UnicodeString);
   begin
     if aValue = '' then
       raise EContractViolation.Create('Argument cannot be an empty string');
   end;
 
 
-  class procedure Contract.NotEmpty(aValue: UnicodeString; var aLen: Integer);
+  class procedure Contract.NotEmpty(  aValue: UnicodeString;
+                                    var aLen: Integer);
   begin
     aLen := Length(aValue);
     if aLen = 0 then
@@ -87,24 +84,24 @@ implementation
   end;
 
 
-  class procedure Contract.Minimum(aValue, aFloor: Integer; const aParamName: String);
+  class procedure Contract.Minimum(aValue, aMinimum: Integer);
   begin
-    if aValue < aFloor then
-      raise EContractViolation.CreateFmt('Invalid argument (%d).  %d is the minimum allowed', [aValue, aFloor]);
+    if aValue < aMinimum then
+      raise EContractViolation.CreateFmt('Argument value (%d) cannot be less than %d', [aValue, aMinimum]);
   end;
 
 
-  class procedure Contract.NotNull(aValue: ANSIChar);
+  class procedure Contract.NotNull(aValue: AnsiChar);
   begin
     if aValue = #0 then
-      raise EContractViolation.Create('Invalid NULL char argument');
+      raise EContractViolation.Create('Argument cannot be null (#0)');
   end;
 
 
-  class procedure Contract.NotNull(aValue: WIDEChar);
+  class procedure Contract.NotNull(aValue: WideChar);
   begin
     if aValue = #0 then
-      raise EContractViolation.Create('Invalid NULL char argument');
+      raise EContractViolation.Create('Argument cannot be null (#0)');
   end;
 
 
@@ -114,21 +111,19 @@ implementation
   end;
 
 
-  class procedure Contract.ValidIndex(const aString: ANSIString;
-                                            aIndex: Integer;
-                                      const aMessage: String);
+  class procedure Contract.ValidIndex(const aString: AnsiString;
+                                            aIndex: Integer);
   begin
     if (aIndex < 1) or (aIndex > Length(aString)) then
-      raise EContractViolation.Create(STR.Coalesce(aMessage, 'Invalid string index'));
+      raise EContractViolation.CreateFmt('Argument %d is not a valid index into string', [aIndex]);
   end;
 
 
   class procedure Contract.ValidIndex(const aString: UnicodeString;
-                                            aIndex: Integer;
-                                      const aMessage: String);
+                                            aIndex: Integer);
   begin
     if (aIndex < 1) or (aIndex > Length(aString)) then
-      raise EContractViolation.Create(STR.Coalesce(aMessage, 'Invalid string index'));
+      raise EContractViolation.CreateFmt('Argument %d is not a valid index into string', [aIndex]);
   end;
 
 

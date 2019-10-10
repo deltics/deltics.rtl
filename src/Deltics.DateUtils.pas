@@ -50,10 +50,11 @@
 
 interface
 
-  {$ifdef DELPHI2006_OR_2007}
   uses
-    Controls; // Contains TDate and TTime declarations in Delphi 2006/2007 only
+  {$ifdef DELPHI2006_OR_2007}
+    Controls, // Contains TDate and TTime declarations in Delphi 2006/2007 only
   {$endif}
+    Windows;
 
   type
   {$ifdef DELPHI2006_OR_2007}               // Alias the TDate and TTime types from Controls
@@ -139,15 +140,20 @@ interface
   function CustomBasisTime: TDateTime;
 
 
+  // Additional Windows API's not imported by the VCL Windows unit
+
+  function TzSpecificLocalTimeToSystemTime(lpTimeZoneInformation: PTimeZoneInformation;
+                                           var lpLocalTime, lpUniversalTime: TSystemTime): BOOL; stdcall;
+    external kernel32 name 'TzSpecificLocalTimeToSystemTime';
+
+
 implementation
 
   uses
     DateUtils,
     Math,
     SysUtils,
-    Windows,
-    Deltics.Strings,
-    Deltics.Windows;
+    Deltics.Strings;
 
 
 

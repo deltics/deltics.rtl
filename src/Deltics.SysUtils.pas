@@ -58,7 +58,6 @@ interface
     TlHelp32,
   {$endif}
   { deltics: }
-//    Deltics.Strings,
     Deltics.Types;
 
 
@@ -182,9 +181,7 @@ implementation
     Contnrs,
     ActiveX,
     Math,
-    Windows,
-  { deltics: }
-    Deltics.Windows;
+    Windows;
 
 
 
