@@ -29,9 +29,7 @@ uses
   Deltics.Types in '..\src\Deltics.Types.pas',
   Deltics.Uri in '..\src\Deltics.Uri.pas',
   Deltics.VersionInfo in '..\src\Deltics.VersionInfo.pas',
-{$ifdef __DELPHI2009}
-  Deltics.VMT in '..\src\Deltics.VMT.pas',
-{$endif};
+  Deltics.VMT in '..\src\Deltics.VMT.pas';
 
 begin
 end.

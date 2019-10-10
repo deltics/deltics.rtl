@@ -66,13 +66,19 @@
 
   unit Deltics.VMT;
 
+{$ifdef DELPHI2010__}
+
+  {.$ifdef TEST}
+    interface
+    implementation
+    end.
+  {.$else}
+    {.$message FATAL 'Deltics.VMT unit does not support Delphi 2010 or later.  Use Deltics.RTTI or TRTTIContext from System.RTTI instead'}
+  {.$endif}
+
+{$else}
 
 interface
-
-{$ifdef DELPHI2010__}
-  {$message FATAL 'Deltics.VMT unit does not support Delphi 2010 or later'}
-  //  Use Deltics.RTTI or TRTTIContext from System.RTTI instead
-{$endif}
 
   uses
     SysUtils;
@@ -356,7 +362,5 @@ implementation
   end;
 
 
-
-
-  
 end.
+{$endif DELPHI2010__ (the else, i.e. __DELPHI2009)}
