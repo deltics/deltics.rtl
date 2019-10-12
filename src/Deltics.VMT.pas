@@ -58,7 +58,7 @@
 
 {$i deltics.rtl.inc}
 
-{$ifdef deltics_vmt}
+{$ifdef debugDelticsVmt}
   {$debuginfo ON}
 {$else}
   {$debuginfo OFF}
@@ -71,7 +71,6 @@
   {.$ifdef TEST}
     interface
     implementation
-    end.
   {.$else}
     {.$message FATAL 'Deltics.VMT unit does not support Delphi 2010 or later.  Use Deltics.RTTI or TRTTIContext from System.RTTI instead'}
   {.$endif}
@@ -362,5 +361,6 @@ implementation
   end;
 
 
-end.
 {$endif DELPHI2010__ (the else, i.e. __DELPHI2009)}
+end.
+
