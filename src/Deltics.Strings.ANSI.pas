@@ -19,15 +19,12 @@ interface
     ANSIFn = class
     private
       class function AddressOfByte(aBase: Pointer; aByteIndex: Integer): PANSIChar; overload; {$ifdef InlineMethods} inline; {$endif}
-      class function AddressOfIndex(aBase: PANSIChar; aIndex: Integer): PANSIChar; overload; {$ifdef InlineMethods} inline; {$endif}
       class function AddressOfIndex(const aString: ANSIString; aIndex: Integer): PANSIChar; overload; {$ifdef InlineMethods} inline; {$endif}
-      class procedure FastCopy(const aString: ANSIString; aDest: PANSIChar); overload; {$ifdef InlineMethods} inline; {$endif}
       class procedure FastCopy(const aString: ANSIString; aDest: PANSIChar; aLen: Integer); overload; {$ifdef InlineMethods} inline; {$endif}
       class procedure FastCopy(const aString: ANSIString; var aDest: ANSIString; aDestIndex: Integer); overload; {$ifdef InlineMethods} inline; {$endif}
       class procedure FastCopy(const aString: ANSIString; var aDest: ANSIString; aDestIndex: Integer; aLen: Integer); overload; {$ifdef InlineMethods} inline; {$endif}
       class procedure FastMove(var aString: ANSIString; aFromIndex, aToIndex, aCount: Integer); overload; {$ifdef InlineMethods} inline; {$endif}
-      class procedure FastWrite(const aString: ANSIString; var aDest: PANSIChar); overload; {$ifdef InlineMethods} inline; {$endif}
-      class procedure FastWrite(const aString: ANSIString; var aDest: PANSIChar; aLen: Integer); overload; {$ifdef InlineMethods} inline; {$endif}
+      class procedure FastWrite(const aString: ANSIString; var aDest: PANSIChar; aLen: Integer); overload; {$ifdef InlineMethods} inline; {$endif}
       class function CheckCase(const aString: ANSIString; aCaseFn: TANSITestCharFn): Boolean;
       class procedure CopyToBuffer(const aString: ANSIString; aMaxBytes: Integer; aBuffer: Pointer; aOffset: Integer); overload;
 
@@ -434,7 +431,7 @@ implementation
 
   uses
   { vcl: }
-  {$ifdef DELPHIXE4__}
+  {$ifdef DELPHI2009__}
     ANSIStrings,
   {$endif}
   { deltics: }
@@ -474,34 +471,21 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function ANSIFn.AddressOfIndex(aBase: PANSIChar;
-                                       aIndex: Integer): PANSIChar;
-  var
-    ibase: IntPointer absolute aBase;
-    iaddr: IntPointer absolute result;
-  begin
-    iaddr := ibase + (NativeUInt(aIndex) - 1);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   class function ANSIFn.AddressOfIndex(const aString: ANSIString;
                                              aIndex: Integer): PANSIChar;
-  var
-    istr: Integer absolute aString;
-    iaddr: Integer absolute result;
   begin
-    iaddr := istr + aIndex - 1;
+    result := @aString[aIndex];
   end;
 
 
+(*
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   class procedure ANSIFn.FastCopy(const aString: ANSIString;
                                         aDest: PANSIChar);
   begin
     CopyMemory(aDest, PANSIChar(aString), Length(aString));
   end;
-
+*)
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   class procedure ANSIFn.FastCopy(const aString: ANSIString;
@@ -544,20 +528,6 @@ implementation
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   class procedure ANSIFn.FastWrite(const aString: ANSIString;
-                                   var   aDest: PANSIChar);
-  var
-    strLen: Integer;
-  begin
-    if NOT HasLength(aString, strLen) then
-      EXIT;
-
-    CopyMemory(aDest, PANSIChar(aString), strLen);
-    aDest := AddressOfIndex(aDest, strLen + 1);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class procedure ANSIFn.FastWrite(const aString: ANSIString;
                                    var   aDest: PANSIChar;
                                          aLen: Integer);
   var
@@ -1334,7 +1304,7 @@ implementation
   class function ANSIFn.Format(const aString: ANSIString;
                                const aArgs: array of const): ANSIString;
   begin
-  {$ifdef DELPHIXE4__}
+  {$ifdef DELPHI2009__}
     result := ANSIStrings.Format(aString, aArgs);
   {$else}
     result := SysUtils.Format(aString, aArgs);

@@ -19,7 +19,6 @@ interface
     WIDEFn = class
     private
       class function AddressOfByte(aBase: Pointer; aByteIndex: Integer): PWIDEChar; overload; {$ifdef InlineMethods} inline; {$endif}
-      class function AddressOfIndex(aBase: PWIDEChar; aIndex: Integer): PWIDEChar; overload; {$ifdef InlineMethods} inline; {$endif}
       class function AddressOfIndex(var aString: UnicodeString; aIndex: Integer): PWIDEChar; overload; {$ifdef InlineMethods} inline; {$endif}
       class procedure FastCopy(const aString: UnicodeString; aDest: PWIDEChar); overload; {$ifdef InlineMethods} inline; {$endif}
       class procedure FastCopy(const aString: UnicodeString; aDest: PWIDEChar; aLen: Integer); overload; {$ifdef InlineMethods} inline; {$endif}
@@ -578,24 +577,10 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function WIDEFn.AddressOfIndex(aBase: PWIDEChar;
-                                       aIndex: Integer): PWIDEChar;
-  var
-    ibase: IntPointer absolute aBase;
-    iaddr: IntPointer absolute result;
-  begin
-    iaddr := ibase + ((NativeUInt(aIndex) - 1) * 2);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   class function WIDEFn.AddressOfIndex(var aString: UnicodeString;
                                            aIndex: Integer): PWIDEChar;
-  var
-    istr: IntPointer absolute aString;
-    iaddr: IntPointer absolute result;
   begin
-    iaddr := istr + ((NativeUInt(aIndex) - 1) * 2);
+    result := @aString[aIndex];
   end;
 
 
