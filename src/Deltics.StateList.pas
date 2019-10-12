@@ -268,8 +268,11 @@ implementation
   begin
     Lock;
     try
-      state   := Ref[aStateID];
+      state := Ref[aStateID];
+      {$ifdef __TOKYO}  // Up to RIO (10.3) the compiler wasn't able to see that changed was initialised in the case statement.
+                        //  From 10.3 (onward? still to be proven) it is, and so this initialisation produces a "value assigned never used" hint instead.
       changed := FALSE;
+      {$endif}
 
       case state.Counted of
       FALSE:
