@@ -17,7 +17,10 @@ interface
     ENotSupportedException  = {$ifdef __DELPHI2009} class(Exception) {$else} SysUtils.ENotSupportedException {$endif};
 
 
-    ENotImplemented = class(SysUtils.ENotImplemented)
+    ENotImplemented = class(
+      {$ifdef __DELPHI2007} Exception
+                    {$else} SysUtils.ENotImplemented
+                   {$endif})
     public
       constructor Create(const aClass: TClass; const aSignature: String); overload;
       constructor Create(const aObject: TObject; const aSignature: String); overload;
