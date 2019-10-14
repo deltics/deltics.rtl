@@ -102,8 +102,10 @@ interface
     dtMilliseconds  = dtMillisecond;
 
 
+(*
   function StrIsDate(const aString, aFormat: String): Boolean;
   function StrToDate(const aString, aFormat: String): TDate;
+*)
 
   function DateDiff(const aEarlier, aLater: TDateTime): Double;
   function DateDiffInMilliseconds(const aEarlier, aLater: TDateTime): Int64;
@@ -152,11 +154,11 @@ implementation
   uses
     DateUtils,
     Math,
-    SysUtils,
-    Deltics.Strings;
+    SysUtils;
 
 
 
+(*
   function StrIsDate(const aString, aFormat: String): Boolean;
   var
     parts: TStringArray;
@@ -203,7 +205,7 @@ implementation
 
     result := EncodeDate(y, m, d);
   end;
-
+*)
 
   var
     _BasisTime: TDateTime;

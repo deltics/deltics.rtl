@@ -39,9 +39,10 @@
 
 {$i deltics.rtl.inc}
 
-{$ifdef ddx_classes}
+{$ifdef debugDelticsClasses}
   {$debuginfo ON}
 {$endif}
+
 
   unit Deltics.Classes;
 
@@ -244,33 +245,6 @@ interface
     end;
 
 
-    TGUIDList = class
-    private
-      fCount: Integer;
-      fIsSorted: Boolean;
-      fItems: array of TGUID;
-      fSorted: Boolean;
-      function get_Capacity: Integer;
-      function get_Item(const aIndex: Integer): TGUID;
-      procedure set_Capacity(const aValue: Integer);
-      procedure set_Item(const aIndex: Integer; const aValue: TGUID);
-      procedure set_Sorted(const aValue: Boolean);
-    protected
-      procedure IncreaseCapacity;
-    public
-      procedure Add(const aGUID: TGUID);
-      procedure Clear;
-      function Contains(const aGUID: TGUID): Boolean;
-      procedure Delete(const aGUID: TGUID);
-      function IndexOf(const aGUID: TGUID): Integer;
-      procedure Sort;
-      property Capacity: Integer read get_Capacity write set_Capacity;
-      property Count: Integer read fCount;
-      property Items[const aIndex: Integer]: TGUID read get_Item write set_Item; default;
-      property Sorted: Boolean read fSorted write set_Sorted;
-    end;
-
-
     TListAddMethod = function(aValue: Integer): Integer of object;
 
     {$WARNINGS OFF}
@@ -295,9 +269,7 @@ interface
       property IsEmpty: Boolean read get_IsEmpty;
       property Items[const aIndex: Integer]: Integer read get_Item write set_Item; default;
     end;
-    {$ifNdef NoWarnings}
-      {$WARNINGS ON}
-    {$endif}
+    {$WARNINGS ON}
 
 
     TInterfacedObjectList = class(TComInterfacedObject)
@@ -880,145 +852,6 @@ implementation
         Destroy;
     end;
   end;
-
-
-
-
-
-
-
-{ TGUIDList -------------------------------------------------------------------------------------- }
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure TGUIDList.Add(const aGUID: TGUID);
-  begin
-    if (fCount = Capacity) then
-      IncreaseCapacity;
-
-    fItems[fCount] := aGUID;
-
-    Inc(fCount);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure TGUIDList.Clear;
-  begin
-    fCount := 0;
-    SetLength(fItems, 0);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function TGUIDList.Contains(const aGUID: TGUID): Boolean;
-  begin
-    result := (IndexOf(aGUID) <> -1);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure TGUIDList.Delete(const aGUID: TGUID);
-  var
-    i: Integer;
-  begin
-    i := IndexOf(aGUID);
-
-    if i = -1 then
-      EXIT;
-
-    while (i < Pred(Count)) do
-      fItems[i] := fItems[i + 1];
-
-    Dec(fCount);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function TGUIDList.get_Capacity: Integer;
-  begin
-    result := Length(fItems);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function TGUIDList.get_Item(const aIndex: Integer): TGUID;
-  begin
-    result := fItems[aIndex];
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure TGUIDList.IncreaseCapacity;
-  var
-    i: Integer;
-  begin
-    case Capacity of
-      0     : i := 4;
-      1..64 : i := Capacity * 2
-    else
-      i := Capacity div 4;
-    end;
-
-    SetLength(fItems, i);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function TGUIDList.IndexOf(const aGUID: TGUID): Integer;
-  begin
-    if fIsSorted then
-    begin
-      // TODO: Binary search algorithm
-    end
-    else
-      for result := 0 to Pred(Count) do
-        if GUIDs.AreEqual(aGUID, fItems[result]) then
-          EXIT;
-
-    result := -1;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure TGUIDList.set_Capacity(const aValue: Integer);
-  begin
-    SetLength(fItems, aValue);
-    if (Capacity < fCount) then
-      fCount := Capacity;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure TGUIDList.set_Item(const aIndex: Integer; const aValue: TGUID);
-  begin
-    fItems[aIndex] := aValue;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure TGUIDList.set_Sorted(const aValue: Boolean);
-  begin
-    if fSorted = aValue then
-      EXIT;
-
-    fSorted := aValue;
-
-    if fSorted and NOT fIsSorted then
-      Sort;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure TGUIDList.Sort;
-  begin
-    ASSERT(FALSE, 'Oops, hasn''t been implemented yet!');
-
-    fIsSorted := TRUE;
-  end;
-
-
-
-
 
 
 

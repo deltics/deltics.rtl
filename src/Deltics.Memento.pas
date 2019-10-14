@@ -37,9 +37,9 @@
   website         : <EXTLINK http://www.deltics.co.nz>www.deltics.co.nz</EXTLINK>
 }
 
-{$i Deltics.RTL.inc}
+{$i deltics.rtl.inc}
 
-{$ifdef debug_Deltics_Memento}
+{$ifdef debugDelticsMemento}
   {$debuginfo ON}
 {$else}
   {$debuginfo OFF}
@@ -50,6 +50,9 @@
 
 
 interface
+
+  uses
+    Deltics.Classes;
 
   type
     TMementoState = (
@@ -66,7 +69,7 @@ interface
     end;
 
 
-    TMemento = class(TInterfacedObject, IMemento)
+    TMemento = class(TComInterfacedObject, IMemento)
     private
       fState: TMementoState;
       property State: TMementoState read fState;

@@ -39,11 +39,12 @@
 
 {$i deltics.rtl.inc}
 
-{$ifdef deltics_sysutils}
+{$ifdef debugDelticsSysUtils}
   {$debuginfo ON}
 {$else}
   {$debuginfo OFF}
 {$endif}
+
 
   unit Deltics.SysUtils;
 
@@ -54,33 +55,23 @@ interface
   { vcl: }
     Classes,
     SysUtils,
-  {$ifdef MSWINDOWS}
-    TlHelp32,
-  {$endif}
   { deltics: }
-    Deltics.Types;
+    Deltics.Exceptions;
 
 
   const
     EmptyStr: String = '';
 
 
-
   type
+    PObject = ^TObject;
+
     IAutoFree = interface
     ['{9C3B2944-EA08-4301-A6E1-C0EB94D54771}']
       procedure Add(const aReferences: array of PObject); overload;
       procedure Add(const aObjects: array of TObject); overload;
     end;
 
-    Exception = SysUtils.Exception;
-    ENotImplemented = class(Exception)
-    public
-      constructor Create(const aClass: TClass; const aSignature: String); overload;
-      constructor Create(const aObject: TObject; const aSignature: String); overload;
-    end;
-
-    EAccessDenied = class(EOSError);
 
 
     TRoundingStrategy = (
@@ -89,15 +80,9 @@ interface
                          rsTowardsZero
                         );
 
+  // TODO: Move to a VCL namespace
     TComponentProc = procedure(const aComponent: TComponent);
     TFilterFn = function(const aValue): Boolean;
-
-
-    TriBoolean = (
-                  tbUnknown,
-                  tbTRUE,
-                  tbFALSE
-                 );
 
 
   procedure CloneList(const aSource: TList; const aDest: TList);
@@ -114,9 +99,6 @@ interface
   function IfThen(aValue: Boolean; aTrue, aFalse: Boolean): Boolean; overload;
   function IfThen(aValue: Boolean; aTrue, aFalse: TObject): TObject; overload;
   function IfThen(aValue: Boolean; aTrue, aFalse: Integer): Integer; overload;
-//  function IfThen(aValue: Boolean; aTrue, aFalse: ANSIString): ANSIString; overload;
-//  function IfThen(aValue: Boolean; aTrue, aFalse: UnicodeString): UnicodeString; overload;
-  function IfThenInt(aValue: Boolean; aTrue, aFalse: Integer): Integer;
 
   function StringIndex(const aString: String; const aCases: array of String): Integer;
   function TextIndex(const aString: String; const aCases: array of String): Integer;
@@ -130,7 +112,7 @@ interface
   function Max(ValueA, ValueB: Integer): Integer; overload;
 
   procedure Exchange(var A, B; aSize: LongWord = 4); overload;
-//  procedure Exchange(var A, B: UnicodeString); overload;
+  procedure Exchange(var A, B: UnicodeString); overload;
 
   procedure AddTrailingBackslash(var aString: String);
   procedure RemoveTrailingBackslash(var aString: String);
@@ -153,23 +135,25 @@ interface
                  const aStrategy: TRoundingStrategy = rsDefault): Integer;
 
 
+  // TODO: Move to a VCL namespace
   procedure ForEachComponent(const aComponent: TComponent;
                              const aProc: TComponentProc;
                              const aRecursive: Boolean = TRUE;
                              const aClass: TComponentClass = NIL);
 
 
-{$ifdef MSWINDOWS}
-  function Exec(const aEXE: String; const aCommandLine: String = ''): Cardinal;
-  procedure ExecAndWait(const aEXE: String; const aCommandLine: String = '');
-  function FindProcess(const aEXEName: String; var aProcess: TProcessEntry32): Boolean;
-  function ProcessExists(const aEXEName: String): Boolean;
-  function RegisterDLL(const aFileName: String; const aRegistrationProc: String = 'Register'): Boolean;
-{$endif}
 
-  function IsTRUE(const aTri: TriBoolean): Boolean;
-  function IsFALSE(const aTri: TriBoolean): Boolean;
-  function IsKnown(const aTri: TriBoolean): Boolean;
+  type
+    NullableBoolean = (
+                       nbNull,
+                       nbFALSE,
+                       nbTRUE
+                      );
+
+  function IsTRUE(const aBool: NullableBoolean): Boolean;
+  function IsFALSE(const aBool: NullableBoolean): Boolean;
+  function IsNull(const aBool: NullableBoolean): Boolean;
+  function IsNotNull(const aBool: NullableBoolean): Boolean;
 
 
 
@@ -179,17 +163,17 @@ implementation
   uses
   { vcl: }
     Contnrs,
-    ActiveX,
     Math,
-    Windows;
+    Windows,
+  { deltics: }
+    Deltics.Classes;
 
 
 
 { ------------------------------------------------------------------------------------------------ }
 
   type
-    TAutoFree = class(TInterfacedObject, IUnknown,
-                                         IAutoFree)
+    TAutoFree = class(TComInterfacedObject, IAutoFree)
     private
       fObjects: TObjectList;
       fReferences: TList;
@@ -203,6 +187,7 @@ implementation
       procedure Add(const aObjects: array of TObject); overload;
     end;
 
+
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   constructor TAutoFree.Create;
   begin
@@ -211,6 +196,7 @@ implementation
     fObjects    := TObjectList.Create(TRUE);
     fReferences := TList.Create;
   end;
+
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   constructor TAutoFree.CreateByRef(const aReferences: array of PObject;
@@ -227,6 +213,7 @@ implementation
         Pointer(fReferences[i]^) := NIL;
   end;
 
+
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   constructor TAutoFree.Create(const aObjects: array of TObject);
   begin
@@ -234,6 +221,7 @@ implementation
 
     Add(aObjects);
   end;
+
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   destructor TAutoFree.Destroy;
@@ -249,6 +237,7 @@ implementation
     inherited;
   end;
 
+
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   procedure TAutoFree.Add(const aReferences: array of PObject);
   var
@@ -258,6 +247,7 @@ implementation
       if (fReferences.IndexOf(aReferences[i]) = -1) then
         fReferences.Add(aReferences[i]);
   end;
+
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   procedure TAutoFree.Add(const aObjects: array of TObject);
@@ -414,39 +404,8 @@ implementation
   end;
 
 
-(*
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function IfThen(aValue: Boolean; aTrue, aFalse: ANSIString): ANSIString;
-  begin
-    if aValue then
-      result := aTrue
-    else
-      result := aFalse;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function IfThen(aValue: Boolean; aTrue, aFalse: UnicodeString): UnicodeString;
-  begin
-    if aValue then
-      result := aTrue
-    else
-      result := aFalse;
-  end;
-*)
-
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   function IfThen(aValue: Boolean; aTrue, aFalse: TObject): TObject;
-  begin
-    if aValue then
-      result := aTrue
-    else
-      result := aFalse;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function IfThenInt(aValue: Boolean; aTrue, aFalse: Integer): Integer;
   begin
     if aValue then
       result := aTrue
@@ -586,7 +545,8 @@ implementation
     end;
   end;
 
-(*
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   procedure Exchange(var A, B: UnicodeString);
   var
     T: UnicodeString;
@@ -595,7 +555,7 @@ implementation
     A := B;
     B := T;
   end;
-*)
+
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   procedure AddTrailingBackslash(var aString: String);
@@ -632,26 +592,6 @@ implementation
     end;
   end;
 
-
-
-
-
-{ ENotImplemented -------------------------------------------------------------------------------- }
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  constructor ENotImplemented.Create(const aClass: TClass;
-                                     const aSignature: String);
-  begin
-    inherited CreateFmt('%s.%s', [aClass.ClassName, aSignature]);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  constructor ENotImplemented.Create(const aObject: TObject;
-                                     const aSignature: String);
-  begin
-    inherited CreateFmt('%s.%s', [aObject.ClassName, aSignature]);
-  end;
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
@@ -856,130 +796,32 @@ implementation
   end;
 
 
-{$ifdef MSWINDOWS}
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function Exec(const aEXE: String;
-                const aCommandLine: String): Cardinal;
-  var
-    startup: STARTUPINFO;
-    info: PROCESS_INFORMATION;
+  function IsTRUE(const aBool: NullableBoolean): Boolean;
   begin
-    startup.cb := sizeof(startup);
-    ZeroMemory(@startup, startup.cb);
-
-    CreateProcess(PChar(aEXE), PChar(aEXE + ' ' + aCommandLine), NIL, NIL, FALSE, 0, NIL, NIL, startup, info);
-
-    result := info.dwProcessID;
+    result := (aBool = nbTRUE);
   end;
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure ExecAndWait(const aEXE: String;
-                        const aCommandLine: String);
-  var
-    startup: STARTUPINFO;
-    info: PROCESS_INFORMATION;
+  function IsFALSE(const aBool: NullableBoolean): Boolean;
   begin
-    startup.cb := sizeof(startup);
-    ZeroMemory(@startup, startup.cb);
-
-    CreateProcess(PChar(aEXE), PChar(aEXE + ' ' + aCommandLine), NIL, NIL, FALSE, 0, NIL, NIL, startup, info);
-    WaitForSingleObject(info.hProcess, INFINITE);
+    result := (aBool = nbFALSE);
   end;
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function FindProcess(const aEXEName: String;
-                       var aProcess: TProcessEntry32): Boolean;
-  var
-    snapshot: THandle;
-    process: TProcessEntry32;
+  function IsNull(const aBool: NullableBoolean): Boolean;
   begin
-    result := FALSE;
-
-    snapshot := CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    process.dwSize := SizeOf(process);
-
-    if Process32First(snapshot, process) then
-      while TRUE do
-      begin
-        result := ANSISameText(ExtractFileName(process.szExeFile), aEXEName)
-               or ANSISameText(process.szExeFile, aEXEName);
-
-        if result then
-          aProcess  := process;
-
-        if result or NOT Process32Next(snapshot, process) then
-          BREAK;
-      end;
-
-    CloseHandle(snapshot);
+    result := (aBool = nbNull);
   end;
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function ProcessExists(const aEXEName: String): Boolean;
-  var
-    notUsed: TProcessEntry32;
+  function IsNotNull(const aBool: NullableBoolean): Boolean;
   begin
-    result := FindProcess(aEXEName, notUsed);
+    result := (aBool <> nbNull);
   end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function RegisterDLL(const aFileName: String;
-                       const aRegistrationProc: String): Boolean;
-  var
-    hLib: THandle;
-    ptr: Pointer;
-    proc: TStdCallBooleanFunction;
-  begin
-    hLib := LoadLibrary(PChar(aFileName));
-    if (hLib = 0) then
-      RaiseLastOSError;
-
-    result := FALSE;
-    try
-      ptr  := GetProcAddress(hLib, PChar(aRegistrationProc));
-
-      if NOT Assigned(ptr) then
-        raise Exception.CreateFmt('Registration procedure (%s) not found in library ''%s''.  Check case of procedure name.', [aRegistrationProc, aFileName]);
-
-      proc := TStdCallBooleanFunction(ptr);
-      try
-        result := proc;
-
-      except
-        //
-      end;
-
-    finally
-      FreeLibrary(hLib);
-    end;
-  end;
-{$endif}
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function IsTRUE(const aTri: TriBoolean): Boolean;
-  begin
-    result := (aTri = tbTRUE);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function IsFALSE(const aTri: TriBoolean): Boolean;
-  begin
-    result := (aTri = tbFALSE);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function IsKnown(const aTri: TriBoolean): Boolean;
-  begin
-    result := (aTri <> tbUnknown);
-  end;
-
-
 
 
 

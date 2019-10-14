@@ -5,5 +5,6 @@
 
 {$ifdef debugDelticsRtl}
   {$debuginfo ON}
+  {$undefine InlineMethods}
 {$endif}
 
