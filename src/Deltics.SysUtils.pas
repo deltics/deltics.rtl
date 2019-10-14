@@ -112,7 +112,13 @@ interface
   function Max(ValueA, ValueB: Integer): Integer; overload;
 
   procedure Exchange(var A, B; aSize: LongWord = 4); overload;
+{$ifdef UNICODE}
+  procedure Exchange(var A, B: AnsiString); overload;
   procedure Exchange(var A, B: UnicodeString); overload;
+{$else}
+  procedure Exchange(var A, B: String); overload;
+{$endif}
+  procedure Exchange(var A, B: WideString); overload;
 
   procedure AddTrailingBackslash(var aString: String);
   procedure RemoveTrailingBackslash(var aString: String);
@@ -546,6 +552,8 @@ implementation
   end;
 
 
+{$ifdef UNICODE}
+
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   procedure Exchange(var A, B: UnicodeString);
   var
@@ -555,6 +563,42 @@ implementation
     A := B;
     B := T;
   end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  procedure Exchange(var A, B: AnsiString);
+  var
+    T: AnsiString;
+  begin
+    T := A;
+    A := B;
+    B := T;
+  end;
+
+{$else}
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  procedure Exchange(var A, B: String);
+  var
+    T: String;
+  begin
+    T := A;
+    A := B;
+    B := T;
+  end;
+
+{$endif}
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  procedure Exchange(var A, B: WideString);
+  var
+    T: WideString;
+  begin
+    T := A;
+    A := B;
+    B := T;
+  end;
+
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
