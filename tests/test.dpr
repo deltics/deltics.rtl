@@ -14,8 +14,10 @@ uses
   Deltics.MultiCast in '..\src\Deltics.MultiCast.pas',
   Deltics.RTTI in '..\src\Deltics.RTTI.pas',
   Deltics.StateList in '..\src\Deltics.StateList.pas',
-  Deltics.SysUtils in '..\src\Deltics.SysUtils.pas',
-  Deltics.VMT in '..\src\Deltics.VMT.pas';
+  Deltics.SysUtils in '..\src\Deltics.SysUtils.pas'
+{$ifdef __DELPHI2009}
+  ,Deltics.VMT in '..\src\Deltics.VMT.pas'
+{$endif};
 
 begin
 end.

@@ -1,7 +1,7 @@
 {
-  * X11 (MIT) LICENSE *
+  * MIT LICENSE *
 
-  Copyright © 2010 Jolyon Smith
+  Copyright © 2008 Jolyon Smith
 
   Permission is hereby granted, free of charge, to any person obtaining a copy of
    this software and associated documentation files (the "Software"), to deal in
@@ -31,18 +31,15 @@
 
   * Contact Details *
 
-  Original author : Jolyon Smith
-  skype           : deltics
-  e-mail          : <EXTLINK mailto: jsmith@deltics.co.nz>jsmith@deltics.co.nz</EXTLINK>
-  website         : <EXTLINK http://www.deltics.co.nz>www.deltics.co.nz</EXTLINK>
+  Original author : Jolyon Direnko-Smith
+  e-mail          : jsmith@deltics.co.nz
+  github          : deltics/deltics.rtl
 }
 
 {$i deltics.rtl.inc}
 
-{$ifdef deltics_finalizer}
+{$ifdef debugDelticsFinalizer}
   {$debuginfo ON}
-{$else}
-  {$debuginfo OFF}
 {$endif}
 
   unit Deltics.Finalizer;

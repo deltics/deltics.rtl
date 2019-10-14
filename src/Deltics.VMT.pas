@@ -1,5 +1,5 @@
 {
-  * X11 (MIT) LICENSE *
+  * MIT LICENSE *
 
   Copyright © 2008 Jolyon Smith
 
@@ -31,10 +31,9 @@
 
   * Contact Details *
 
-  Original author : Jolyon Smith
-  skype           : deltics
-  e-mail          : <EXTLINK mailto: jsmith@deltics.co.nz>jsmith@deltics.co.nz</EXTLINK>
-  website         : <EXTLINK http://www.deltics.co.nz>www.deltics.co.nz</EXTLINK>
+  Original author : Jolyon Direnko-Smith
+  e-mail          : jsmith@deltics.co.nz
+  github          : deltics/deltics.rtl
 }
 
 {@@Deltics.VMT.pas
@@ -60,22 +59,15 @@
 
 {$ifdef debugDelticsVmt}
   {$debuginfo ON}
-{$else}
-  {$debuginfo OFF}
 {$endif}
 
   unit Deltics.VMT;
 
+
 {$ifdef DELPHI2010__}
+  {$message FATAL 'Deltics.VMT unit does not support Delphi 2010 or later.  Use Deltics.RTTI or TRTTIContext from System.RTTI instead'}
+{$endif}
 
-  {.$ifdef TEST}
-    interface
-    implementation
-  {.$else}
-    {.$message FATAL 'Deltics.VMT unit does not support Delphi 2010 or later.  Use Deltics.RTTI or TRTTIContext from System.RTTI instead'}
-  {.$endif}
-
-{$else}
 
 interface
 
@@ -361,6 +353,5 @@ implementation
   end;
 
 
-{$endif DELPHI2010__ (the else, i.e. __DELPHI2009)}
 end.
 

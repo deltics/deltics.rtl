@@ -1,5 +1,5 @@
 {
-  * X11 (MIT) LICENSE *
+  * MIT LICENSE *
 
   Copyright © 2008 Jolyon Smith
 
@@ -31,20 +31,16 @@
 
   * Contact Details *
 
-  Original author : Jolyon Smith
-  skype           : deltics
-  e-mail          : <EXTLINK mailto: jsmith@deltics.co.nz>jsmith@deltics.co.nz</EXTLINK>
-  website         : <EXTLINK http://www.deltics.co.nz>www.deltics.co.nz</EXTLINK>
+  Original author : Jolyon Direnko-Smith
+  e-mail          : jsmith@deltics.co.nz
+  github          : deltics/deltics.rtl
 }
 
 {$i deltics.rtl.inc}
 
 {$ifdef debugDelticsMemento}
   {$debuginfo ON}
-{$else}
-  {$debuginfo OFF}
 {$endif}
-
 
   unit Deltics.Memento;
 
