@@ -18,7 +18,7 @@ interface
 
 
     ENotImplemented = class(
-      {$ifdef __DELPHI2007} Exception
+      {$ifdef __DELPHI2009} Exception
                     {$else} SysUtils.ENotImplemented
                    {$endif})
     public
