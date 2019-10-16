@@ -38,56 +38,85 @@
 
 {$i deltics.rtl.inc}
 
-{$ifdef debugDelticsExceptions}
+{$ifdef debugDelticsTypes}
   {$debuginfo ON}
 {$endif}
 
-  unit Deltics.Exceptions;
+  unit Deltics.Types;
 
 
 interface
 
   uses
+  { vcl: }
+    Classes,
     SysUtils;
 
 
   type
-    Exception = SysUtils.Exception;
+  {$ifdef __DELPHIXE}
+    {$ifdef WIN32}
+      NativeUInt  = Cardinal;
+      NativeInt   = Integer;
+    {$else}
+      NativeUInt  = UInt64;
+      NativeInt   = Int64;
+    {$endif}
+  {$endif}
 
-    EArgumentException      = {$ifdef __DELPHI2009} class(Exception) {$else} SysUtils.EArgumentException {$endif};
-    ENotSupportedException  = {$ifdef __DELPHI2009} class(Exception) {$else} SysUtils.ENotSupportedException {$endif};
+    IntPointer  = NativeUInt;
+    PObject     = ^TObject;
+    PUnknown    = ^IUnknown;
 
-    ENotImplemented = class({$ifdef __DELPHI2010} Exception {$else} SysUtils.ENotImplemented {$endif})
-    public
-      constructor Create(const aClass: TClass; const aMethodName: String); overload;
-      constructor Create(const aObject: TObject; const aMethodName: String); overload;
-    end;
 
-    EAccessDenied = class(EOSError);
+    TMilliseconds = type Cardinal;
+    TSeconds = type Cardinal;
 
+
+  type
+    NullableBoolean = (
+                       nbNull,
+                       nbFALSE,
+                       nbTRUE
+                      );
+
+  function IsTRUE(const aBool: NullableBoolean): Boolean;
+  function IsFALSE(const aBool: NullableBoolean): Boolean;
+  function IsNull(const aBool: NullableBoolean): Boolean;
+  function IsNotNull(const aBool: NullableBoolean): Boolean;
 
 
 implementation
 
 
-{ ENotImplemented -------------------------------------------------------------------------------- }
-
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  constructor ENotImplemented.Create(const aClass: TClass;
-                                     const aMethodName: String);
+  function IsTRUE(const aBool: NullableBoolean): Boolean;
   begin
-    inherited CreateFmt('%s.%s has not been implemented', [aClass.ClassName, aMethodName]);
+    result := (aBool = nbTRUE);
   end;
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  constructor ENotImplemented.Create(const aObject: TObject;
-                                     const aMethodName: String);
+  function IsFALSE(const aBool: NullableBoolean): Boolean;
   begin
-    inherited CreateFmt('%s.%s has not been implemented', [aObject.ClassName, aMethodName]);
+    result := (aBool = nbFALSE);
   end;
 
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  function IsNull(const aBool: NullableBoolean): Boolean;
+  begin
+    result := (aBool = nbNull);
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  function IsNotNull(const aBool: NullableBoolean): Boolean;
+  begin
+    result := (aBool <> nbNull);
+  end;
 
 
 
 end.
+

@@ -21,6 +21,7 @@
             "src\\Deltics.RTTI.pas",
             "src\\Deltics.StateList.pas",
             "src\\Deltics.SysUtils.pas",
+            "src\\Deltics.Types.pas",
             "src\\Deltics.VMT.pas"
         ]
     }

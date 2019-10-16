@@ -52,7 +52,8 @@ interface
     Classes,
     SysUtils,
   { deltics: }
-    Deltics.Exceptions;
+    Deltics.Exceptions,
+    Deltics.Types;
 
 
   const
@@ -60,14 +61,11 @@ interface
 
 
   type
-    PObject = ^TObject;
-
     IAutoFree = interface
     ['{9C3B2944-EA08-4301-A6E1-C0EB94D54771}']
       procedure Add(const aReferences: array of PObject); overload;
       procedure Add(const aObjects: array of TObject); overload;
     end;
-
 
 
     TRoundingStrategy = (
@@ -142,20 +140,6 @@ interface
                              const aProc: TComponentProc;
                              const aRecursive: Boolean = TRUE;
                              const aClass: TComponentClass = NIL);
-
-
-
-  type
-    NullableBoolean = (
-                       nbNull,
-                       nbFALSE,
-                       nbTRUE
-                      );
-
-  function IsTRUE(const aBool: NullableBoolean): Boolean;
-  function IsFALSE(const aBool: NullableBoolean): Boolean;
-  function IsNull(const aBool: NullableBoolean): Boolean;
-  function IsNotNull(const aBool: NullableBoolean): Boolean;
 
 
 
@@ -835,33 +819,6 @@ implementation
     result := -1;
   end;
 
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function IsTRUE(const aBool: NullableBoolean): Boolean;
-  begin
-    result := (aBool = nbTRUE);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function IsFALSE(const aBool: NullableBoolean): Boolean;
-  begin
-    result := (aBool = nbFALSE);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function IsNull(const aBool: NullableBoolean): Boolean;
-  begin
-    result := (aBool = nbNull);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function IsNotNull(const aBool: NullableBoolean): Boolean;
-  begin
-    result := (aBool <> nbNull);
-  end;
 
 
 

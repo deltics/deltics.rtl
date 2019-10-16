@@ -67,8 +67,6 @@ interface
 
     TListDuplicatesOption = (doAllow, doIgnore, doError);
 
-    PUnknown = ^IUnknown;
-
 
     TNamedNotifyEvent = procedure(const aSender: TObject; const aName: String) of object;
 
