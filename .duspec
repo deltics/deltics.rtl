@@ -6,14 +6,13 @@
     language: "en",
     content: "source",
     dependencies: [
-        "deltics.inc:1.0.0"
+        "deltics.inc:1.0.2"
     ],
     source: {
         files: [    
             "src\\deltics.rtl.inc",
             "src\\Deltics.Classes.pas",
             "src\\Deltics.DateUtils.pas",
-            "src\\Deltics.Exceptions.pas",
             "src\\Deltics.Finalizer.pas",
             "src\\Deltics.GUIDs.pas",
             "src\\Deltics.Memento.pas",

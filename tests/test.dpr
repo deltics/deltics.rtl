@@ -7,7 +7,6 @@ uses
   Deltics.Smoketest,
   Deltics.Classes in '..\src\Deltics.Classes.pas',
   Deltics.DateUtils in '..\src\Deltics.DateUtils.pas',
-  Deltics.Exceptions in '..\src\Deltics.Exceptions.pas',
   Deltics.Finalizer in '..\src\Deltics.Finalizer.pas',
   Deltics.GUIDs in '..\src\Deltics.GUIDs.pas',
   Deltics.Memento in '..\src\Deltics.Memento.pas',
