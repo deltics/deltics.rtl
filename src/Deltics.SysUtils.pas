@@ -117,20 +117,6 @@ interface
   procedure AddTrailingBackslash(var aString: String);
   procedure RemoveTrailingBackslash(var aString: String);
 
-  function BinToHex(const aBuf: Pointer; const aSize: Integer): String;
-  function HexToBin(const aString: String; var aSize: Integer): Pointer; overload;
-  procedure HexToBin(const aString: String; var aBuf; const aSize: Integer); overload;
-  procedure FillZero(var aDest; const aSize: Integer); overload;
-
-  function ByteOffset(const aPointer: Pointer; const aOffset: Integer): PByte;
-
-  function ReverseBytes(const aValue: Word): Word; overload;
-  function ReverseBytes(const aValue: LongWord): LongWord; overload;
-  function ReverseBytes(const aValue: Int64): Int64; overload;
-
-  procedure ReverseBytes(aBuffer: System.PWord; const aWords: Integer); overload;
-  procedure ReverseBytes(aBuffer: System.PCardinal; const aCardinals: Integer); overload;
-
   function Round(const aValue: Extended;
                  const aStrategy: TRoundingStrategy = rsDefault): Integer;
 
@@ -616,134 +602,6 @@ implementation
     end;
   end;
 
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function ByteOffset(const aPointer: Pointer; const aOffset: Integer): PByte;
-  begin
-    result := PByte(NativeInt(aPointer) + aOffset);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function ReverseBytes(const aValue: Word): Word;
-  begin
-    result :=  (((aValue and $ff00) shr 8)
-             or ((aValue and $00ff) shl 8));
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function ReverseBytes(const aValue: LongWord): LongWord;
-  begin
-    result :=  (((aValue and $ff000000) shr 24)
-            or  ((aValue and $00ff0000) shr 8)
-            or  ((aValue and $0000ff00) shl 8)
-            or  ((aValue and $000000ff) shl 24));
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function ReverseBytes(const aValue: Int64): Int64;
-  begin
-    result :=  (((aValue and $ff00000000000000) shr 56)
-            or  ((aValue and $00ff000000000000) shr 40)
-            or  ((aValue and $0000ff0000000000) shr 24)
-            or  ((aValue and $000000ff00000000) shr 8)
-            or  ((aValue and $00000000ff000000) shl 8)
-            or  ((aValue and $0000000000ff0000) shl 24)
-            or  ((aValue and $000000000000ff00) shl 40)
-            or  ((aValue and $00000000000000ff) shl 56));
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure ReverseBytes(      aBuffer: System.PWord;
-                         const aWords: Integer);
-  var
-    i: Integer;
-  begin
-    for i := Pred(aWords) downto 0 do
-    begin
-      aBuffer^ :=  (((aBuffer^ and $ff00) shr 8)
-                 or ((aBuffer^ and $00ff) shl 8));
-      Inc(aBuffer);
-    end;
-  end;
-
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure ReverseBytes(      aBuffer: System.PCardinal;
-                         const aCardinals: Integer);
-  var
-    i: Integer;
-  begin
-    for i := Pred(aCardinals) downto 0 do
-    begin
-      aBuffer^ :=  (((aBuffer^ and $ff000000) shr 24)
-                or  ((aBuffer^ and $00ff0000) shr 8)
-                or  ((aBuffer^ and $0000ff00) shl 8)
-                or  ((aBuffer^ and $000000ff) shl 24));
-
-      Inc(aBuffer);
-    end;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function BinToHex(const aBuf: Pointer;
-                    const aSize: Integer): String;
-  const
-    DIGITS = '0123456789abcdef';
-  var
-    i: Integer;
-    c: PByte;
-  begin
-    result  := '';
-    c       := aBuf;
-
-    for i := 1 to aSize do
-    begin
-      result := result + DIGITS[(c^ and $F0) shr 4 + 1];
-      result := result + DIGITS[(c^ and $0F) + 1];
-      Inc(c);
-    end;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function HexToBin(const aString: String;
-                    var aSize: Integer): Pointer;
-  begin
-    result  := NIL;
-    aSize   := Length(aString) div 2;
-
-    if aSize = 0 then
-      EXIT;
-
-    result := AllocMem(aSize);
-    HexToBin(aString, result^, aSize);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure HexToBin(const aString: String;
-                     var aBuf;
-                     const aSize: Integer);
-  begin
-    if aSize = 0 then
-      EXIT;
-
-    Classes.HexToBin(PChar(aString), PANSIChar(@aBuf), aSize);
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  procedure FillZero(var aDest; const aSize: Integer);
-  begin
-    FillChar(aDest, aSize, 0);
-  end;
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
