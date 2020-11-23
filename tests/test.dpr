@@ -6,7 +6,6 @@
 uses
   Deltics.Smoketest,
   Deltics.Classes in '..\src\Deltics.Classes.pas',
-  Deltics.DateUtils in '..\src\Deltics.DateUtils.pas',
   Deltics.Finalizer in '..\src\Deltics.Finalizer.pas',
   Deltics.GUIDs in '..\src\Deltics.GUIDs.pas',
   Deltics.Memento in '..\src\Deltics.Memento.pas',
@@ -14,10 +13,8 @@ uses
   Deltics.RTTI in '..\src\Deltics.RTTI.pas',
   Deltics.StateList in '..\src\Deltics.StateList.pas',
   Deltics.SysUtils in '..\src\Deltics.SysUtils.pas',
-  Deltics.Types in '..\src\Deltics.Types.pas'
-{$ifdef __DELPHI2009}
-  ,Deltics.VMT in '..\src\Deltics.VMT.pas'
-{$endif};
+  Deltics.Types in '..\src\Deltics.Types.pas',
+  Deltics.VMT in '..\src\Deltics.VMT.pas';
 
 begin
 end.

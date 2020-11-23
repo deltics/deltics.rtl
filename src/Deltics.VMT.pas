@@ -57,19 +57,21 @@
 
 {$i deltics.rtl.inc}
 
-{$ifdef debugDelticsVmt}
+{$ifdef debug_DelticsVmt}
   {$debuginfo ON}
 {$endif}
 
   unit Deltics.VMT;
 
 
-{$ifdef DELPHI2010__}
-  {$message FATAL 'Deltics.VMT unit does not support Delphi 2010 or later.  Use Deltics.RTTI or TRTTIContext from System.RTTI instead'}
-{$endif}
+//{$ifdef DELPHI2010__}
+//  {$message FATAL 'Deltics.VMT unit does not support Delphi 2010 or later.  Use Deltics.RTTI or TRTTIContext from System.RTTI instead'}
+//{$endif}
 
 
 interface
+
+{$ifdef __DELPHI2009} // Entire Unit is a NO-OP unless compiling pre-Delphi 2010
 
   uses
     SysUtils;
@@ -242,9 +244,12 @@ interface
   function GetVirtualMethodTable(const aClass: TClass): PVirtualMethodTable; overload;
   function GetVirtualMethodTable(const aObject: TObject): PVirtualMethodTable; overload;
 
+{$endif}
 
 
 implementation
+
+{$ifdef __DELPHI2009}
 
   resourcestring
     rsfENoPublishedMethods  = '%s has no published methods';
@@ -352,6 +357,7 @@ implementation
     result := GetVirtualMethodTable(aObject.ClassType);
   end;
 
+{$endif}
 
 end.
 
