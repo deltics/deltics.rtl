@@ -1,7 +1,7 @@
 {
   * MIT LICENSE *
 
-  Copyright © 2008 Jolyon Smith
+  Copyright ï¿½ 2008 Jolyon Smith
 
   Permission is hereby granted, free of charge, to any person obtaining a copy of
    this software and associated documentation files (the "Software"), to deal in
@@ -68,12 +68,6 @@ interface
     end;
 
 
-    TRoundingStrategy = (
-                         rsDefault,
-                         rsAwayFromZero,
-                         rsTowardsZero
-                        );
-
   // TODO: Move to a VCL namespace
     TComponentProc = procedure(const aComponent: TComponent);
     TFilterFn = function(const aValue): Boolean;
@@ -97,14 +91,6 @@ interface
   function StringIndex(const aString: String; const aCases: array of String): Integer;
   function TextIndex(const aString: String; const aCases: array of String): Integer;
 
-  function Min64(ValueA, ValueB: Int64): Int64;
-  function Min(ValueA, ValueB: Cardinal): Cardinal; overload;
-  function Min(ValueA, ValueB: Integer): Integer; overload;
-
-  function Max64(ValueA, ValueB: Int64): Int64;
-  function Max(ValueA, ValueB: Cardinal): Cardinal; overload;
-  function Max(ValueA, ValueB: Integer): Integer; overload;
-
   procedure Exchange(var A, B; aSize: LongWord = 4); overload;
 {$ifdef UNICODE}
   procedure Exchange(var A, B: AnsiString); overload;
@@ -116,10 +102,6 @@ interface
 
   procedure AddTrailingBackslash(var aString: String);
   procedure RemoveTrailingBackslash(var aString: String);
-
-  function Round(const aValue: Extended;
-                 const aStrategy: TRoundingStrategy = rsDefault): Integer;
-
 
   // TODO: Move to a VCL namespace
   procedure ForEachComponent(const aComponent: TComponent;
@@ -386,64 +368,6 @@ implementation
   end;
 
 
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function Min64(ValueA, ValueB: Int64): Int64;
-  begin
-    if (ValueA < ValueB) then
-      result := ValueA
-    else
-      result := ValueB;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function Min(ValueA, ValueB: Cardinal): Cardinal;
-  begin
-    if (ValueA < ValueB) then
-      result := ValueA
-    else
-      result := ValueB;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function Min(ValueA, ValueB: Integer): Integer;
-  begin
-    if (ValueA < ValueB) then
-      result := ValueA
-    else
-      result := ValueB;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function Max64(ValueA, ValueB: Int64): Int64;
-  begin
-    if (ValueA > ValueB) then
-      result := ValueA
-    else
-      result := ValueB;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function Max(ValueA, ValueB: Cardinal): Cardinal;
-  begin
-    if (ValueA > ValueB) then
-      result := ValueA
-    else
-      result := ValueB;
-  end;
-
-
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function Max(ValueA, ValueB: Integer): Integer;
-  begin
-    if (ValueA > ValueB) then
-      result := ValueA
-    else
-      result := ValueB;
-  end;
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
@@ -604,32 +528,7 @@ implementation
 
 
 
-  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  function Round(const aValue: Extended;
-                 const aStrategy: TRoundingStrategy = rsDefault): Integer;
-  var
-    remainder: Extended;
-  begin
-    if (aStrategy = rsDefault) then
-      result := System.Round(aValue)
-    else
-    begin
-      result    := Trunc(aValue);
-      remainder := Frac(aValue);
 
-      case aStrategy of
-        rsAwayFromZero  : if (remainder < 0) then
-                            Dec(result)
-                          else if (remainder > 0) then
-                            Inc(result);
-
-        rsTowardsZero   : if (remainder < 0) then
-                            Inc(result)
-                          else if (remainder > 0) then
-                            Dec(result);
-      end;
-    end;
-  end;
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
