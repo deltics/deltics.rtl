@@ -12,7 +12,6 @@
         files: [    
             "src\\deltics.rtl.inc",
             "src\\Deltics.Classes.pas",
-            "src\\Deltics.DateUtils.pas",
             "src\\Deltics.Finalizer.pas",
             "src\\Deltics.GUIDs.pas",
             "src\\Deltics.Memento.pas",
